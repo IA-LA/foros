@@ -1,5 +1,5 @@
 
-  *Una institución académica, una universidad, se puede juzgar por la forma en que trata a sus alumnos. **— Anónimo
+  *Una institución académica, una universidad, se puede juzgar por la forma en que trata a sus alumnos.* **— Anónimo**
 
 **INDICE DE CONTENIDOS**
 1. Introducción
