@@ -13,7 +13,7 @@ NLP (token stem), Lematization, Synonim, PoS y Sentinel
                                                                |
                                     Analisis  _________________|__________________  Clasificacion
                                     ========                                        =============
-                      _________________|__________________              _________________|______________________...
-                     |        |        |        |         |            |                 |                  |
-                tokenizado  raices   postag  genero  sentimiento   NaïveBayes       NaïveBayes+             AD  ... SVM, etc.
-                ----------  ------   ------  ------  -----------   ---------        -----------             --               
+                      _________________|__________________              _________________|________...
+                     |        |        |        |         |            |           |          |
+                tokenizado  raices   postag  genero  sentimiento   NaïveBayes  NaïveBayes+    AD  ... SVM, etc.
+                ----------  ------   ------  ------  -----------   ---------   -----------    --               
