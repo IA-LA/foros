@@ -13,14 +13,37 @@ import os
 # Módulos propios
 import procesadoMensaje
 
+id_foro = 16735771
+nombreForo = 'nombreForo'
+id_asig = 1234567
+tit_hilo = 'títuloHilo'
+id_hilo = 33078833
+id_mensaje = '33078833_1'
+id_ref_mensaje = ''
+id_autor = 0
+autor = 'Nombre Apellidos'
+dia_semana = 'Lunes'
+fecha = '00/00/00'
+hora = '00:00:00'
+tit_mensaje = 'título mensaje'
+texto = 'texto mensaje'
+caracteres = 0
+
+mensaje1 = {'Foro': 16735771, 'ForoN': 'nombreForo', 'Asignatura': 1234567, 'Título': 'títuloHilo',
+           'Hilo': 33078833,
+           'Mensaje': '33078833_1', 'Responde a': '',
+           'Remitente': 12345678, 'Autor': 'Nombre Apellidos', 'Día': 'Lunes', 'Fecha': '00/00/00', 'Hora': '00:00:00',
+           'Título mensaje': 'título mensaje',
+           'Texto mensaje': 'texto mensaje'.strip(), 'Caracteres mensaje': len('texto mensaje')
+           }
 
 # Obejto de intercambio
 # Formato Mensajes de los foros
 class Mensaje(object):
     id_foro = 16735771
-    nombreForo = 'nombre'
+    nombreForo = 'nombreForo'
     id_asig = 1234567
-    tit_hilo = 'título'
+    tit_hilo = 'títuloHilo'
     id_hilo = 33078833
     id_mensaje = '33078833_1'
     id_ref_mensaje = ''
@@ -32,35 +55,84 @@ class Mensaje(object):
     tit_mensaje= 'título mensaje'
     texto = 'texto mensaje'
     caracteres = 0
-
     mensaje = {'Foro': id_foro, 'ForoN': nombreForo, 'Asignatura': id_asig, 'Título': tit_hilo,
-             'Hilo': id_hilo,
-             'Mensaje': id_mensaje, 'Responde a': id_ref_mensaje,
-             'Remitente': id_autor, 'Autor': autor, 'Día': dia_semana, 'Fecha': fecha, 'Hora': hora,
-             'Título mensaje': tit_mensaje,
-             'Texto mensaje': texto.strip(), 'Caracteres mensaje': len(texto)
+               'Hilo': id_hilo,
+               'Mensaje': id_mensaje, 'Responde a': id_ref_mensaje,
+               'Remitente': id_autor, 'Autor': autor, 'Día': dia_semana, 'Fecha': fecha, 'Hora': hora,
+               'Título mensaje': tit_mensaje,
+               'Texto mensaje': texto.strip(), 'Caracteres mensaje': len(texto)
                }
 
-    def asignarmensaje(mensaje):
-        id_foro = mensaje.id_foro
-        nombreForo = mensaje.nombreForo
-        id_asig = mensaje.id_asig
-        tit_hilo = mensaje.tit_hilo
-        id_hilo = mensaje.id_hilo
-        id_mensaje = mensaje.id_mensaje
-        id_ref_mensaje = mensaje.id_ref_mensaje
-        id_autor = mensaje.id_autor
-        autor = mensaje.autor
-        dia_semana = mensaje.dia_semana
-        fecha = mensaje.fecha
-        hora = mensaje.hora
-        tit_mensaje = mensaje.tit_mensaje
-        texto = mensaje.texto
+    def __init__(self, mensaje):
+        self.id_foro = mensaje["Foro"]
+        self.nombreForo = mensaje["ForoN"]
+        self.id_asig = mensaje["Asignatura"]
+        self.tit_hilo = mensaje["Título"]
+        self.id_hilo = mensaje["Hilo"]
+        self.id_mensaje = mensaje["Mensaje"]
+        self.id_ref_mensaje = mensaje["Responde a"]
+        self.id_autor = mensaje["Remitente"]
+        self.autor = mensaje["Autor"]
+        self.dia_semana = mensaje["Día"]
+        self.fecha = mensaje["Fecha"]
+        self.hora = mensaje["Hora"]
+        self.tit_mensaje = mensaje["Título mensaje"]
+        self.texto = mensaje["Caracteres mensaje"]
 
-        print(id_foro, nombreForo, id_asig, tit_hilo, id_hilo, id_mensaje, id_ref_mensaje, id_autor, autor, dia_semana, fecha, hora, tit_mensaje, texto)
+        print(mensaje)
+
+        return None
+
+    def asignarmensaje(self, mensaje):
+        self.id_foro = mensaje["Foro"]
+        self.nombreForo = mensaje["ForoN"]
+        self.id_asig = mensaje["Asignatura"]
+        self.tit_hilo = mensaje["Título"]
+        self.id_hilo = mensaje["Hilo"]
+        self.id_mensaje = mensaje["Mensaje"]
+        self.id_ref_mensaje = mensaje["Responde a"]
+        self.id_autor = mensaje["Remitente"]
+        self.autor = mensaje["Autor"]
+        self.dia_semana = mensaje["Día"]
+        self.fecha = mensaje["Fecha"]
+        self.hora = mensaje["Hora"]
+        self.tit_mensaje = mensaje["Título mensaje"]
+        self.texto = mensaje["Caracteres mensaje"]
+
+        print(self.id_foro, self.nombreForo, self.id_asig, self.tit_hilo, self.id_hilo, self.id_mensaje, self.id_ref_mensaje, self.id_autor, self.autor, self.dia_semana, self.fecha, self.hora, self.tit_mensaje, self.texto)
 
         pass
 
+
+# Obejto de intercambio
+# Formato Características de los Mensajes de los foros
+class Caracteristicas(object):
+    pass
+
+
+# Obejto de intercambio
+# Análisis de Características de los Mensajes de los foros
+class Analisis(object):
+    pass
+
+
+# Obejto de intercambio
+# Clasificación x Características de los Mensajes de los foros
+class Clasificacion(object):
+    pass
+
+
+# Obejto de intercambio
+# Clustering x Características de los Mensajes de los foros
+class Clustering(object):
+    pass
+
+
+import json
+# Objeto
+msg = Mensaje(mensaje1)
+msg.asignarmensaje(mensaje1)
+print('AAAAAAAAAAAAAAAAAAAAAA', mensaje1)
 
 # de modelos
 # de taggers java
@@ -277,185 +349,186 @@ def genero():
 
   return {0}
 
+def sentimiento():
+    #ANALISIS EDL SENTIMIENTO
+    ########################
+    import nltk.classify.util
+    from nltk.classify import NaiveBayesClassifier
 
-#ANALISIS EDL SENTIMIENTO
-########################
-import nltk.classify.util
-from nltk.classify import NaiveBayesClassifier
+    print('SENTINEL lang = ES')
+    print('###################')
 
-print('SENTINEL lang = ES')
-print('###################')
+    fileP = open(os.path.join(dir_path, 'sentimiento\\positive.txt'), 'r', encoding='utf-8')
+    fileN = open(os.path.join(dir_path, 'sentimiento\\negative.txt'), 'r', encoding='utf-8')
+    fileL = open(os.path.join(dir_path, 'sentimiento\\neutral.txt'), 'r', encoding='utf-8')
 
-fileP = open(os.path.join(dir_path, 'sentimiento\\positive.txt'), 'r', encoding='utf-8')
-fileN = open(os.path.join(dir_path, 'sentimiento\\negative.txt'), 'r', encoding='utf-8')
-fileL = open(os.path.join(dir_path, 'sentimiento\\neutral.txt'), 'r', encoding='utf-8')
+    #Array de términos positivos/negativos N-gramas para entrenamiento del modelo
+    positivos = []
+    negativos = []
+    neutros = []
 
-#Array de términos positivos/negativos N-gramas para entrenamiento del modelo
-positivos = []
-negativos = []
-neutros = []
+    #positivos = fileP.read()
+    #negativos = fileN.read()
 
-#positivos = fileP.read()
-#negativos = fileN.read()
+    for line in fileP:
+      #positivos.append(line.replace(" ", "_").replace("\n", "").lower())
+      positivos.append(line.replace(" ", "_").replace("\n", "").lower())
+    for line in fileN:
+      negativos.append(line.replace(" ", "_").replace("\n", "").lower())
+    for line in fileL:
+      neutros.append(line.replace(" ", "_").replace("\n", "").lower())
 
-for line in fileP:
-  #positivos.append(line.replace(" ", "_").replace("\n", "").lower())
-  positivos.append(line.replace(" ", "_").replace("\n", "").lower())
-for line in fileN:
-  negativos.append(line.replace(" ", "_").replace("\n", "").lower())
-for line in fileL:
-  neutros.append(line.replace(" ", "_").replace("\n", "").lower())
+    #print(positivos, negativos)
 
-#print(positivos, negativos)
+    #Array de par (género, nombre N-grama) lang=es
+    positivos.extend([':)', ':-)', ';-)', 'También', 'Tambien', 'Y', 'O', 'Alguien', 'Algo', 'Siempre', 'Alguno', 'Alguna', 'Algunos', 'Algunas', 'Algún', 'Algun', 'También demasiado', 'Tambien demasiado', 'Alguna cosa', ':)', ':)'])
+    negativos.extend([':(', ':-(', ';-(', 'Tampoco', 'Ni', 'Nadie', 'Nada', 'Nunca', 'Ninguno', 'Ninguna', ':(', ':-(', ';(', ';-('])
+    #neutros.extend([])
 
-#Array de par (género, nombre N-grama) lang=es
-positivos.extend([':)', ':-)', ';-)', 'También', 'Tambien', 'Y', 'O', 'Alguien', 'Algo', 'Siempre', 'Alguno', 'Alguna', 'Algunos', 'Algunas', 'Algún', 'Algun', 'También demasiado', 'Tambien demasiado', 'Alguna cosa', ':)', ':)'])
-negativos.extend([':(', ':-(', ';-(', 'Tampoco', 'Ni', 'Nadie', 'Nada', 'Nunca', 'Ninguno', 'Ninguna', ':(', ':-(', ';(', ';-('])
-#neutros.extend([])
+    stopWords = stopwords.words('spanish')
+    # Añadir signos de puntuación
+    stopWords.extend(('¡', '¿', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~'))
 
-stopWords = stopwords.words('spanish')
-# Añadir signos de puntuación
-stopWords.extend(('¡', '¿', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~'))
+    # Añadir pronombres, preposiciones y demás vocabulario sin significación
+    stopWords.extend(['ser', 'estar'])
+    neutros.extend(stopWords)
+    print(stopWords)
 
-# Añadir pronombres, preposiciones y demás vocabulario sin significación
-stopWords.extend(['ser', 'estar'])
-neutros.extend(stopWords)
-print(stopWords)
+    positive_vocab_ES = positivos
+    negative_vocab_ES = negativos
+    neutral_vocab_ES = neutros
 
-positive_vocab_ES = positivos
-negative_vocab_ES = negativos
-neutral_vocab_ES = neutros
+    print(positive_vocab_ES, negative_vocab_ES, neutral_vocab_ES)
 
-print(positive_vocab_ES, negative_vocab_ES, neutral_vocab_ES)
+    ss = SnowballStemmer('spanish')
 
-ss = SnowballStemmer('spanish')
+    # Características par (token, 'pos/neg/neu') de entrenamiento del modelo
+    #positive_features_ES = [(procesadoMensaje.word_feats(pos), 'pos') for pos in positive_vocab_ES]
+    #negative_features_ES = [(procesadoMensaje.word_feats(neg), 'neg') for neg in negative_vocab_ES]
+    #neutral_features_ES = [(procesadoMensaje.word_feats(neu), 'neu') for neu in neutral_vocab_ES]
 
-# Características par (token, 'pos/neg/neu') de entrenamiento del modelo
-#positive_features_ES = [(procesadoMensaje.word_feats(pos), 'pos') for pos in positive_vocab_ES]
-#negative_features_ES = [(procesadoMensaje.word_feats(neg), 'neg') for neg in negative_vocab_ES]
-#neutral_features_ES = [(procesadoMensaje.word_feats(neu), 'neu') for neu in neutral_vocab_ES]
+    positive_features_ES = [(procesadoMensaje.word_feats(pos.lower()), 'positive') for pos in positive_vocab_ES]
+    negative_features_ES = [(procesadoMensaje.word_feats(neg.lower()), 'negative') for neg in negative_vocab_ES]
+    neutral_features_ES = [(procesadoMensaje.word_feats(neu.lower()), 'neutral') for neu in neutral_vocab_ES]
 
-positive_features_ES = [(procesadoMensaje.word_feats(pos.lower()), 'positive') for pos in positive_vocab_ES]
-negative_features_ES = [(procesadoMensaje.word_feats(neg.lower()), 'negative') for neg in negative_vocab_ES]
-neutral_features_ES = [(procesadoMensaje.word_feats(neu.lower()), 'neutral') for neu in neutral_vocab_ES]
+    #positive_features_ES = [(procesadoMensaje.word_feats(ss.stem(pos.lower())), 'pos') for pos in positive_vocab_ES]
+    #negative_features_ES = [(procesadoMensaje.word_feats(ss.stem(neg.lower())), 'neg') for neg in negative_vocab_ES]
+    #neutral_features_ES = [(procesadoMensaje.word_feats(ss.stem(neu.lower())), 'neu') for neu in neutral_vocab_ES]
 
-#positive_features_ES = [(procesadoMensaje.word_feats(ss.stem(pos.lower())), 'pos') for pos in positive_vocab_ES]
-#negative_features_ES = [(procesadoMensaje.word_feats(ss.stem(neg.lower())), 'neg') for neg in negative_vocab_ES]
-#neutral_features_ES = [(procesadoMensaje.word_feats(ss.stem(neu.lower())), 'neu') for neu in neutral_vocab_ES]
+    #train_set_ES = positive_features_ES + negative_features_ES + neutral_features_ES
+    train_set_ES = positive_features_ES + negative_features_ES
 
-#train_set_ES = positive_features_ES + negative_features_ES + neutral_features_ES
-train_set_ES = positive_features_ES + negative_features_ES
+    print('SENTINEL ANALISIS lang = ES', positive_features_ES, positive_vocab_ES, neutral_features_ES)
 
-print('SENTINEL ANALISIS lang = ES', positive_features_ES, positive_vocab_ES, neutral_features_ES)
+    # SENTINEL lang = en
+    ####################
 
-# SENTINEL lang = en
-####################
+    print('SENTINEL lang = EN')
+    print('###################')
 
-print('SENTINEL lang = EN')
-print('###################')
+    #Array de tokens (termino 1-grama) lang=en
+    positive_vocab = ['awesome', 'outstanding', 'fantastic', 'terrific', 'good', 'nice', 'great', ':)']
+    negative_vocab = ['bad', 'terrible', 'useless', 'hate', ':(']
+    neutral_vocab = ['movie', 'the', 'sound', 'was', 'is', 'actors', 'did', 'know', 'words', 'not']
 
-#Array de tokens (termino 1-grama) lang=en
-positive_vocab = ['awesome', 'outstanding', 'fantastic', 'terrific', 'good', 'nice', 'great', ':)']
-negative_vocab = ['bad', 'terrible', 'useless', 'hate', ':(']
-neutral_vocab = ['movie', 'the', 'sound', 'was', 'is', 'actors', 'did', 'know', 'words', 'not']
+    # Características par (token, 'pos/neg/neu') de entrenamiento del modelo
+    positive_features = [(procesadoMensaje.word_feats(pos.lower()), 'pos') for pos in positive_vocab]
+    negative_features = [(procesadoMensaje.word_feats(neg.lower()), 'neg') for neg in negative_vocab]
+    neutral_features = [(procesadoMensaje.word_feats(neu.lower()), 'neu') for neu in neutral_vocab]
 
-# Características par (token, 'pos/neg/neu') de entrenamiento del modelo
-positive_features = [(procesadoMensaje.word_feats(pos.lower()), 'pos') for pos in positive_vocab]
-negative_features = [(procesadoMensaje.word_feats(neg.lower()), 'neg') for neg in negative_vocab]
-neutral_features = [(procesadoMensaje.word_feats(neu.lower()), 'neu') for neu in neutral_vocab]
+    #train_set = positive_features + negative_features + neutral_features
+    train_set = positive_features + negative_features
 
-#train_set = positive_features + negative_features + neutral_features
-train_set = positive_features + negative_features
+    print('SENTINEL ANALISIS lang = EN', positive_features, negative_features, neutral_features)
 
-print('SENTINEL ANALISIS lang = EN', positive_features, negative_features, neutral_features)
+    # Clasificadores
+    # ES
+    classifier1_ES = NaiveBayesClassifier.train(train_set_ES)
+    classifier2_ES = nltk.classify.positivenaivebayes.NaiveBayesClassifier.train(train_set_ES)
+    classifier3_ES = nltk.classify.decisiontree.DecisionTreeClassifier.train(train_set_ES)
+    # EN
+    classifier = NaiveBayesClassifier.train(train_set)
 
-# Clasificadores
-# ES
-classifier1_ES = NaiveBayesClassifier.train(train_set_ES)
-classifier2_ES = nltk.classify.positivenaivebayes.NaiveBayesClassifier.train(train_set_ES)
-classifier3_ES = nltk.classify.decisiontree.DecisionTreeClassifier.train(train_set_ES)
-# EN
-classifier = NaiveBayesClassifier.train(train_set)
+    # Predict ES
+    neg = 0
+    pos = 0
+    sentence_ES_P = "Impresionante película, también me ha gustado"
+    sentence_ES_N = "Mala película, no me ha gustado"
 
-# Predict ES
-neg = 0
-pos = 0
-sentence_ES_P = "Impresionante película, también me ha gustado"
-sentence_ES_N = "Mala película, no me ha gustado"
+    sentence = sentence_ES_N
 
-sentence = sentence_ES_N
+    # C Spanish
+    print('TAGGING C lang="es"')
+    print('#######')
 
-# C Spanish
-print('TAGGING C lang="es"')
-print('#######')
+    # Lectura desde ficheros
+    # del tagger java Stanford
 
-# Lectura desde ficheros
-# del tagger java Stanford
+    # about the tagger: http://nlp.stanford.edu/software/tagger.shtml
+    # about the tagset: nlp.lsi.upc.edu/freeling/doc/tagsets/tagset-es.html
+    spanish_postagger = StanfordPOSTagger(os.path.join(dir_path, 'standford/models/spanish.tagger'), os.path.join(dir_path, 'standford/stanford-postagger.jar'), encoding='utf8')
 
-# about the tagger: http://nlp.stanford.edu/software/tagger.shtml
-# about the tagset: nlp.lsi.upc.edu/freeling/doc/tagsets/tagset-es.html
-spanish_postagger = StanfordPOSTagger(os.path.join(dir_path, 'standford/models/spanish.tagger'), os.path.join(dir_path, 'standford/stanford-postagger.jar'), encoding='utf8')
+    posTag = []
+    for sentencia in sent_tokenize(sentence.lower()):
+      posTag = posTag + spanish_postagger.tag(word_tokenize(sentencia))
 
-posTag = []
-for sentencia in sent_tokenize(sentence.lower()):
-  posTag = posTag + spanish_postagger.tag(word_tokenize(sentencia))
+    print('POSTAG', posTag)
+    nombres = []
+    for wordTag in posTag:
+      if 'nc' in wordTag[1]:
+        nombres.append(wordTag)
 
-print('POSTAG', posTag)
-nombres = []
-for wordTag in posTag:
-  if 'nc' in wordTag[1]:
-    nombres.append(wordTag)
+    print('NOMBRES', nombres)
 
-print('NOMBRES', nombres)
+    from nltk.tokenize import RegexpTokenizer
 
-from nltk.tokenize import RegexpTokenizer
+    tokenizer = RegexpTokenizer(r'\w+')
+    words = tokenizer.tokenize(sentence)
 
-tokenizer = RegexpTokenizer(r'\w+')
-words = tokenizer.tokenize(sentence)
+    #words = sentence.split(' ')
+    for word in words:
+      #classResult_ES = classifier_ES.classify(procesadoMensaje.word_feats(ss.stem(word.lower())))
+      classResult1_ES = classifier1_ES.classify(procesadoMensaje.word_feats(word.lower()))
+      classResult2_ES = classifier2_ES.classify(procesadoMensaje.word_feats(word.lower()))
+      classResult3_ES = classifier3_ES.classify(procesadoMensaje.word_feats(word.lower()))
 
-#words = sentence.split(' ')
-for word in words:
-  #classResult_ES = classifier_ES.classify(procesadoMensaje.word_feats(ss.stem(word.lower())))
-  classResult1_ES = classifier1_ES.classify(procesadoMensaje.word_feats(word.lower()))
-  classResult2_ES = classifier2_ES.classify(procesadoMensaje.word_feats(word.lower()))
-  classResult3_ES = classifier3_ES.classify(procesadoMensaje.word_feats(word.lower()))
+      classResult_ES = procesadoMensaje.ponderarClasificación([classResult1_ES, classResult2_ES, classResult3_ES])
 
-  classResult_ES = procesadoMensaje.ponderarClasificación([classResult1_ES, classResult2_ES, classResult3_ES])
+      if ((word.lower() not in stopWords) and (word.lower() not in nombres[0])) or (word.lower() in 'no') or (word.lower() in 'sí'):
+        if classResult_ES == 'neutral':
+          pos = pos + 1
+          print(word, 'neutral', ss.stem(word))
+        if classResult_ES == 'negative':
+          neg = neg + 1
+          print(word, 'negative', ss.stem(word))
+        if classResult_ES == 'positive':
+          pos = pos + 1
+          print(word, 'positive', ss.stem(word))
 
-  if ((word.lower() not in stopWords) and (word.lower() not in nombres[0])) or (word.lower() in 'no') or (word.lower() in 'sí'):
-    if classResult_ES == 'neutral':
-      pos = pos + 1
-      print(word, 'neutral', ss.stem(word))
-    if classResult_ES == 'negative':
-      neg = neg + 1
-      print(word, 'negative', ss.stem(word))
-    if classResult_ES == 'positive':
-      pos = pos + 1
-      print(word, 'positive', ss.stem(word))
+    print('Positive ES: ' + str(float(pos) / len(words)))
+    print('Negative ES: ' + str(float(neg) / len(words)))
 
-print('Positive ES: ' + str(float(pos) / len(words)))
-print('Negative ES: ' + str(float(neg) / len(words)))
+    # Predict EN
+    neg = 0
+    pos = 0
 
-# Predict EN
-neg = 0
-pos = 0
+    sentence = "Awesome movie, I liked it"
 
-sentence = "Awesome movie, I liked it"
+    words = sentence.split(' ')
+    for word in words:
+      classResult = classifier.classify(procesadoMensaje.word_feats(word))
+      if classResult == 'neg':
+        neg = neg + 1
+        print(word,'neg')
+      if classResult == 'pos':
+        pos = pos + 1
+        print(word,'pos')
 
-words = sentence.split(' ')
-for word in words:
-  classResult = classifier.classify(procesadoMensaje.word_feats(word))
-  if classResult == 'neg':
-    neg = neg + 1
-    print(word,'neg')
-  if classResult == 'pos':
-    pos = pos + 1
-    print(word,'pos')
+    print('Positive EN: ' + str(float(pos) / len(words)))
+    print('Negative EN: ' + str(float(neg) / len(words)))
 
-print('Positive EN: ' + str(float(pos) / len(words)))
-print('Negative EN: ' + str(float(neg) / len(words)))
+    return 0
 
-exit(0);
 
 print('ANT/SINONIMOS lang="en"')
 print('#######')
@@ -500,6 +573,7 @@ print(reader.fileids())
 #print(reader.words('wn_synset.xml'))
 print(reader.words())
 
+
 print('LEMAS lang="en"')
 print('#######')
 from nltk.stem import WordNetLemmatizer
@@ -519,21 +593,24 @@ print(lemmatizer.lemmatize('playing', pos="a"))
 print(lemmatizer.lemmatize('playing', pos="r"))
 
 print("before __name__ guard")
+
 if __name__ == '__main__':
   print('FRASES Y TOKENS')
   print('STOPWRODS')
-  tokenizado()
+  # tokenizado()
 
   print('RAICES')
-  raices()
+  # raices()
 
   print('POS-TAG')
-  postag()
+  # postag()
 
   print('NOMBRES/GENERO')
-  genero()
+  # genero()
 
   print('SENTIMIENTO')
+  # sentimiento()
+
   print('SINONIMOS')
   print('LEMAS')
 
