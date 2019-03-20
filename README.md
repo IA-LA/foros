@@ -1,30 +1,19 @@
 # foros
 NLP (token stem), Lematization, Synonim, PoS y Sentinel
 ## Diagrama de Clases:
-          
-                           Foro
-                           ====
-                            |
-                            |
-                            |
-          Contenidos       Hilo                               K-medias
-               \           ====                                  |_________|_________|
-                 \          |                                                              
-                   \        |                                              |
-                     \      |                                              |                  
-         Tipo -------- [ Mensaje ] _________  Caracteristicas          Clustering
-                         =======              ===============          ==========
-                            |                        |                     |
-                            |                        |                     |
-                            |                        |_____________________|
-                         Usuario                               |
-                         =======                               |
+                                                                                          
+                                                                                |_________|_________| 
+                                                                                          |                  
+    [ Mensaje ] ______________________________________  Caracteristicas                   |
+      =======                                           ===============               Clustering
+                                                               |                      ==========
+                                                               |                           |
+                                                               |___________________________|
+                                                               |
+                                                               |
                                     Analisis  _________________|__________________  Clasificacion
                                     ========                                        =============
-                                       |                                                 |
-                                       |                                                 | 
-                      _________________|__________________              _________________|_______...
-                     |        |        |        |         |            |           |         |
-                tokenizado  raices   postag  genero  sentimiento   NaïveBayes  NaïveBayes+   AD  ... SVM, etc.
-                ----------  ------   ------  ------  -----------   ---------   -----------             --
-                
+                      _________________|__________________              _________________|______________________...
+                     |        |        |        |         |            |                 |                  |
+                tokenizado  raices   postag  genero  sentimiento   NaïveBayes       NaïveBayes+             AD  ... SVM, etc.
+                ----------  ------   ------  ------  -----------   ---------        -----------             --               
