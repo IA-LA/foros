@@ -7,7 +7,7 @@ NLP (token stem), Lematization, Synonim, PoS y Sentinel
                             |
                             |
                             |
-          Contenidos       Hilo                               K-medias
+          Contenidos       Hilo                               K-medias    SOM
                \           ====                                  |_________|_________|
                  \          |                                                              
                    \        |                                              |
