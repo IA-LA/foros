@@ -17,7 +17,7 @@ pd.set_option('display.width', desired_width)
 pd.set_option("display.max_columns", 10)
 
 
-def leer_archivo(input_file):
+def generar_df(input_file):
     df = pd.read_csv(input_file)
     # Anonimizado
     df['Texto mensaje'] = '(Borrado)'
@@ -45,7 +45,7 @@ def escribir_excel(df, nombre_archivo, nombre_hoja):
 
 
 def distribucion_temporal_dias_semana(input_file, export_file):
-    df = leer_archivo(input_file)
+    df = generar_df(input_file)
 
     # Poblema formato Fechas y Horas
     df['Fecha'] = pd.to_datetime(df['Fecha'], format='%d/%m/%Y')
@@ -73,7 +73,7 @@ def distribucion_temporal_dias_semana(input_file, export_file):
 
 
 def distribucion_temporal_fechas(input_file, export_file):
-    df = leer_archivo(input_file)
+    df = generar_df(input_file)
 
     # Poblema formato Fechas y Horas
     df['Fecha'] = pd.to_datetime(df['Fecha'], format='%d/%m/%Y')
@@ -117,7 +117,7 @@ def distribucion_temporal_fechas(input_file, export_file):
 
 
 def distribucion_temporal_rango_horas(input_file, export_file):
-    df = leer_archivo(input_file)
+    df = generar_df(input_file)
 
     # Poblema formato Fechas y Horas
     df['Fecha'] = pd.to_datetime(df['Fecha'], format='%d/%m/%Y')
@@ -150,7 +150,7 @@ def distribucion_temporal_rango_horas(input_file, export_file):
 
 
 def distribucion_personas_dias(input_file, export_file):
-    df = leer_archivo(input_file)
+    df = generar_df(input_file)
 
     # Poblema formato Fechas y Horas
     df['Fecha'] = pd.to_datetime(df['Fecha'], format='%d/%m/%Y')
@@ -176,7 +176,7 @@ def distribucion_personas_dias(input_file, export_file):
 
 
 def distribucion_personas_horas(input_file, export_file):
-    df = leer_archivo(input_file)
+    df = generar_df(input_file)
 
     # Poblema formato Fechas y Horas
     df['Fecha'] = pd.to_datetime(df['Fecha'], format='%d/%m/%Y')
@@ -216,16 +216,19 @@ def distribucion_personas_dias_horas(input_file, export_file):
 
 
 def distribucion_personas_semanas(input_file, export_file):
-    df = leer_archivo(input_file)
+    df = generar_df(input_file)
 
     # Poblema formato Fechas y Horas
     df['Fecha'] = pd.to_datetime(df['Fecha'])
     df['Hora'] = pd.to_datetime(df['Hora'])
-
     # Fin Poblema formato Fechas y Horas
 
-    df_personas_semanas = df.groupby([df.Autor, df.Remitente, pd.Grouper(key='Fecha', freq='W-MON')]).size()
+    df = df.sort_values(by=['Fecha'], ascending=True)
+
+    df_personas_semanas = df.groupby([df.Autor, df.Remitente, pd.Grouper(key='Date', sort=True, freq='W-MON')]).size()
     # print(df_personas_semanas)
+
+    df_personas_semanas = df_personas_semanas.sort_values()
     df_def = df_personas_semanas.unstack()
     df_def = df_def.fillna(0)
     df_def = df_def.astype(np.int64)
@@ -238,9 +241,9 @@ def distribucion_personas_semanas(input_file, export_file):
     return df_def
 
 
-# INICIO añadido FJ
+# INICIO añadido FJSB
 def df_personas_mensajes_fechas_diff(input_file, export_file):
-    df = leer_archivo(input_file)
+    df = generar_df(input_file)
     # print(df)
 
     df_ = df.groupby([df.Autor, df.Remitente, df.Date, (df.sort_values(by=['Autor', 'Date']).rename(columns={'Date': 'Diff'}).Diff.diff().astype('timedelta64', copy=False).clip(lower=0)), pd.Grouper(key='Autor')]).size()
@@ -262,7 +265,7 @@ def df_personas_mensajes_fechas_diff(input_file, export_file):
 
 
 def df_personas_mensajes_hilos_fechas_diff(input_file, export_file):
-    df = leer_archivo(input_file)
+    df = generar_df(input_file)
     # print(df)
 
     df_ = df.groupby([df.Autor, df.Remitente, df.Hilo, df.Date, (df.sort_values(by=['Autor', 'Hilo', 'Date']).rename(columns={'Date': 'Diff'}).Diff.diff()), pd.Grouper(key='Autor')]).size()
@@ -279,7 +282,7 @@ def df_personas_mensajes_hilos_fechas_diff(input_file, export_file):
 
 
 def df_personas_participacion(input_file, export_file):
-    df = leer_archivo(input_file)
+    df = generar_df(input_file)
     # print(df)
 
     df_ = df.groupby(['Autor', 'Remitente']).size().sort_values(ascending=False, na_position='last')
@@ -303,7 +306,7 @@ def df_personas_participacion(input_file, export_file):
 
 
 def df_personas_pruebas(input_file, export_file):
-    df = leer_archivo(input_file)
+    df = generar_df(input_file)
 
     #print(df)
     #df.sort_values(by=['Autor', 'Remitente', 'Fecha', 'Hora'], ascending=[True, True, True, True])
@@ -347,11 +350,11 @@ def df_personas_pruebas(input_file, export_file):
     escribir_excel(df_def, export_file, 'Personas pruebas')
     exit(1)
     return df_def
-# FIN Añadido FJ
+# FIN Añadido FJSB
 
 
 def distribucion_hilos_horas(input_file, export_file):
-    df = leer_archivo(input_file)
+    df = generar_df(input_file)
 
     # Poblema formato Fechas y Horas
     df['Fecha'] = pd.to_datetime(df['Fecha'], format='%d/%m/%Y')
@@ -371,7 +374,8 @@ def distribucion_hilos_horas(input_file, export_file):
     # print(df_hilos_rango_horas)
     # print(df_hilos_rango_horas.to_frame().info())
 
-    df_def = df_hilos_rango_horas.to_frame().reset_index()
+    df_def = df_hilos_rango_horas.to_frame(name='Total').reset_index()
+
     df_def['Hora'] = df_def['Hora'].dt.time
     #df_def.rename(columns={'0': 'Total'})
     #df_def.columns = [['Hora', 'Total']]
@@ -383,9 +387,9 @@ def distribucion_hilos_horas(input_file, export_file):
     return df_def
 
 
-# INICIO Añadido FJ
+# INICIO Añadido FJSB
 def df_hilos_pruebas(input_file, export_file):
-    df = leer_archivo(input_file)
+    df = generar_df(input_file)
 
     # agrupar por hilos y rango de horas
     # print(df.info())
@@ -403,11 +407,11 @@ def df_hilos_pruebas(input_file, export_file):
     # escribir_csv(df_def, 'export/hilos_horas.csv')
     escribir_excel(df_def, export_file, 'Hilos horas pruebas')
     return df_def
+# FIN Añadido FJSB
 
-# FIN Añadido FJ
 
 def generar_archivos_cuerpo(input_file):
-    df = leer_archivo(input_file)
+    df = generar_df(input_file)
     eleccion = ""
     while eleccion != '1' and eleccion != '2' and eleccion != '3':
         print('Opciones: ')
@@ -449,9 +453,9 @@ def generar_archivos_cuerpo(input_file):
     print('Creados ficheros en carpeta ' + raiz)
 
 
-def ejecutarFunciones(nombrearchivo):
-    csv = nombrearchivo + ".csv"
-    # QUITADO EJECUCION-RAPIDA
+def generar_hojas_default(nombrearchivo):
+    csv = nombrearchivo + '.csv'
+
     #Temporal
     distribucion_temporal_dias_semana(csv, nombrearchivo)
     distribucion_temporal_fechas(csv, nombrearchivo)
@@ -461,12 +465,40 @@ def ejecutarFunciones(nombrearchivo):
     distribucion_personas_dias_horas(csv, nombrearchivo)
     distribucion_personas_semanas(csv, nombrearchivo)
 
+    #hilos
+    distribucion_hilos_horas(csv, nombrearchivo)
+
+
+# INICIO Añadido FJSB
+def generar_hojas_base(nombrearchivo):
+    csv = nombrearchivo + '.csv'
+    nombrearchivo = nombrearchivo + '_base'
+
+    #Temporal
+    distribucion_temporal_dias_semana(csv, nombrearchivo)
+    distribucion_temporal_fechas(csv, nombrearchivo)
+    distribucion_temporal_rango_horas(csv, nombrearchivo)
+
+    #Personas
+    distribucion_personas_dias_horas(csv, nombrearchivo)
+    distribucion_personas_semanas(csv, nombrearchivo)
+
+    #hilos
+    distribucion_hilos_horas(csv, nombrearchivo)
+
+
+def generar_hojas_ampliada(nombrearchivo):
+    csv = nombrearchivo + '.csv'
+    nombrearchivo = nombrearchivo + '_ampliado'
+
     # AMPLIADOS INICIO
-    #df_personas_mensajes_fechas_diff(csv, nombrearchivo)
-    #df_personas_mensajes_hilos_fechas_diff(csv, nombrearchivo)
-    #df_personas_participacion(csv, nombrearchivo)
-    #df_personas_pruebas(csv, nombrearchivo)
+    df_personas_mensajes_fechas_diff(csv, nombrearchivo)
+    df_personas_mensajes_hilos_fechas_diff(csv, nombrearchivo)
+    df_personas_participacion(csv, nombrearchivo)
+    # df_personas_pruebas(csv, nombrearchivo)
     # FIN AMPLIADOS
 
-    distribucion_hilos_horas(csv, nombrearchivo)
-    #df_hilos_pruebas(csv,
+    # hilos
+    # df_hilos_pruebas(csv, nombrearchivo)
+# FIN Añadido FJSB
+

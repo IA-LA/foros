@@ -14,3 +14,9 @@
 6201105-    Foros-Historia-de-la-Psicología_2017-18.txt             Historia de la Psicología
 62011066    Foros-Psicología-Aprendizaje_2017-18.txt                Psicología del Aprendizaje
 62011020    Foros-Psicología-Social_2017-18.txt                     Psicología Social
+
+
+
+
+
+

@@ -7,8 +7,8 @@ NLP (token stem), Lematization, Synonim, PoS y Sentinel
                             |
                             |
                             |
-          Contenidos       Hilo                               K-medias    SOM
-               \           ====                                  |_________|_________|
+          Contenidos       Hilo                               K-medias    SOM    ...     
+               \           ====                                  |_________|____ ... _____|
                  \          |                                                              
                    \        |                                              |
                      \      |                                              |                  
@@ -23,8 +23,8 @@ NLP (token stem), Lematization, Synonim, PoS y Sentinel
                                     ========                                        =============
                                        |                                                 |
                                        |                                                 | 
-                      _________________|__________________              _________________|_______...
-                     |        |        |        |         |            |           |         |
+                      _________________|__________________              _________________|_______...__
+                     |        |        |        |         |            |           |         |        |
                 tokenizado  raices   postag  genero  sentimiento   NaïveBayes  NaïveBayes+   AD  ... SVM, etc.
-                ----------  ------   ------  ------  -----------   ---------   -----------             --
+                ----------  ------   ------  ------  -----------   ---------   -----------   --       --
                

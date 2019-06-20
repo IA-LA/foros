@@ -10,7 +10,7 @@ import sys
 import os
 
 
-def convertir_utf8(path):
+def generar_utf8(path):
 
     print('Generando 2', path, os.path.splitext(path)[0] + 'utf8.txt')
 
