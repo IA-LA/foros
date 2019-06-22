@@ -410,49 +410,6 @@ def df_hilos_pruebas(input_file, export_file):
 # FIN Añadido FJSB
 
 
-def generar_archivos_cuerpo(input_file):
-    df = generar_df(input_file)
-    eleccion = ""
-    while eleccion != '1' and eleccion != '2' and eleccion != '3':
-        print('Opciones: ')
-        print('1. Separar por foros.')
-        print('2. Separar por hilos.')
-        print('3. No separar.')
-
-        eleccion = input()
-
-    raiz = 'asig' + str(df.loc[0, 'Asignatura'])
-    if not os.path.exists(raiz):
-        os.makedirs(raiz)
-
-    if eleccion == '1':
-        for index, row in df.iterrows():
-            hilo = str(row['Hilo'])
-            directory = raiz + '/' + hilo
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-            with open(directory + "/" + row['Mensaje'] + ".txt", "w") as text_file:
-                print(f"" + row['Texto mensaje'], file=text_file)
-    elif eleccion == '2':
-        for index, row in df.iterrows():
-            foro = str(row['Foro'])
-            hilo = str(row['Hilo'])
-            directory = raiz + '/' + foro + '/' + hilo
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-            with open(directory + "/" + row['Mensaje'] + ".txt", "w") as text_file:
-                print(f"" + row['Texto mensaje'], file=text_file)
-    else:
-        for index, row in df.iterrows():
-            directory = raiz
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-            with open(directory + "/" + row['Mensaje'] + ".txt", "w") as text_file:
-                print(f"" + row['Texto mensaje'], file=text_file)
-
-    print('Creados ficheros en carpeta ' + raiz)
-
-
 def generar_hojas_default(nombrearchivo):
     csv = nombrearchivo + '.csv'
 

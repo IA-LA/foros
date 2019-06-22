@@ -8,8 +8,6 @@ Clase principal encargada llamar al parser y generar el archivo csv resultante
 """
 
 import hashlib
-from ConvertirUTF8 import *
-
 
 def month_string_to_number(string):
     m = {
@@ -377,17 +375,32 @@ def generar_mensajes_ampliada(ruta, id_asig):
                     # Tratamiento AMPLIADO
                     #######################
 
+                    #
+                    # DIFERENCIAS ???????????????????????
+                    # Padre-Hijo Antecesor-Sucesor
+
+                    #
+                    # DISTANCIAS ???????????????????????
+                    # Padre-Hijo Antecesor-Sucesor
+
+                    #
+                    # TERMINALES ???????????????????????
+                    #
+
                     # Tipos x posición
+                    # INICIAL
                     if id_ref_mensaje == "":
                         inicial = 1
                         respuesta = 0
-                        # ????????????????????????????????????????????????????????????????
-                        terminal = 0  # Necesita llevar la cuenta de los mensajes del hilo
+                        # TERMINAL ????????????????????????????????????????????????????????????
+                        # cuando un menssaje es Iniciador el anterior es Terminal
+                        terminal = 0  # Necesita llevar la cuenta el mensaje siguiente del hilo
+                    # CONTESTACION O TERMINAL
                     else:
                         inicial = 0
                         respuesta = 1
-                        # ????????????????????????????????????????????????????????????????
-                        terminal = 0  # Necesita llevar la cuenta de los mensajes del hilo
+                        # TERMINAL ?????????????????????????????????????????????????????????????????????????????????????
+                        terminal = 'posible'  # Necesita llevar la cuenta de los mensajes (+2,+3,+4) siguientes del hilo
 
                     import re
 
@@ -395,12 +408,16 @@ def generar_mensajes_ampliada(ruta, id_asig):
                         print(item)
                         return item
 
-                    # Archivos Adjuntos y enlaces
+                    # Busca archivos Adjuntos y enlaces
                     # Cuenta ADJUNTOS: las [IMAGE: '' ...]
-                    n_adjs = len(re.findall(r'(\[IMAGE: \'\'.*\])', texto, re.M | re.I))
-                    t_adj = ''
+                    imagenes = re.findall(r'(\[IMAGE: \'\'.*\])', texto, re.M | re.I)
+                    n_adjs = len(imagenes)
+                    t_adj = 0
                     if n_adjs > 0:
-                        t_adj = 'KB [IMAGE:.*])'
+                        for imagen in imagenes:
+                            t_adj = t_adj + len(imagen)
+                    else:
+                         t_adj = 0  #'0KB [IMAGE:.*])'
 
                     # Cuenta EMOJI: las [IMAGE: '.+' ...]
                     n_emojis = len(re.findall(r'(\[IMAGE: \'.+\'.*\])', texto, re.M | re.I))
@@ -424,17 +441,20 @@ def generar_mensajes_ampliada(ruta, id_asig):
                         n_links = len(re.findall(r'(http)', texto, re.M | re.I))
 
                     # mensaje=[tit_hilo, id_hilo, id_mensaje, id_ref_mensaje, id_autor,autor,  dia_semana, fecha, tit_mensaje, texto]
-                    mensaje = {'Foro': id_foro, 'ForoN': nombreForo, 'Caracteres foro': len(nombreForo),
-                               'Asignatura': id_asig, 'Título': tit_hilo, 'Caracteres hilo': len(tit_hilo),
-                               'Hilo': id_hilo,
+                    mensaje = {'Foro': id_foro, 'Nombre foro': nombreForo, 'Caracteres foro': len(nombreForo),
+                               'Asignatura': id_asig,
+                               'Hilo': id_hilo, 'Título': tit_hilo, 'Caracteres hilo': len(tit_hilo),
                                'Mensaje': id_mensaje, 'Responde a': id_ref_mensaje,
-                               'Inicial': inicial, 'Contestación': respuesta, 'Terminal': terminal,
-                               # cuando un menssaje es Iniciador el anterior es Terminal
-                               'Remitente': id_autor, 'Autor': autor, 'Día': dia_semana, 'Fecha': fecha, 'Hora': hora,
-                               'Date': fecha + ' ' + hora,
-                               'Título mensaje': tit_mensaje, 'Caracteres título': len(tit_mensaje),
-                               'Texto mensaje': texto.strip(), 'Caracteres mensaje': len(texto),
-                               'n_adj': n_adjs, 't_adj': t_adj, 'n_emojis': n_emojis, 'n_links': n_links}
+                               'Inicial': inicial, 'Respuesta': respuesta, 'Terminal': terminal,
+                               # AUTO-RESPUESTA??????????????????
+                               'Remitente': id_autor, 'Autor': autor,
+                               'Día': dia_semana, 'Fecha': fecha, 'Hora': hora, 'Date': fecha + ' ' + hora,
+                               # DISTANCIAS Padre-Hijo Antecesor-Sucesor
+                               'Título mensaje': tit_mensaje, 'Caracteres título mensaje': len(tit_mensaje),
+                               'Texto mensaje': texto.strip(), 'Caracteres texto mensaje': len(texto),
+                               # DIFERENCIAS Padre-Hijo Antecesor-Sucesor
+                               'Palabras': 'nltk.tokenize .corpus .stem .tag.stanford',
+                               'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links}
                     mensajes.append(mensaje)
                     ## Limpia variables
                     texto = ""

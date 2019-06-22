@@ -27,7 +27,6 @@ def generar_utf8(path):
 if __name__ == '__main__':
     convertir_utf8(sys.argv[1])
 
-
-# convertir_utf8(ruta_fichero_plano)
+    #convertir_utf8(ruta_fichero_plano)
 
 

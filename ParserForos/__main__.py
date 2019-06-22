@@ -32,7 +32,8 @@ if __name__ == '__main__':
     ## PRE PROCESADO INICIO ##
     ## 1. MENSAJES ##
     print('Generando 1', rutaynombreUtf8, id_asignatura)
-    lista_de_mensajes = generar_mensajes_base(rutaynombreUtf8, id_asignatura)
+    #lista_de_mensajes = generar_mensajes_base(rutaynombreUtf8, id_asignatura)
+    lista_de_mensajes = generar_mensajes_ampliada(rutaynombreUtf8, id_asignatura)
 
     ## 2. LIMPIEZA de Mensajes ([IMAGE: ] y FOROS Profesor-Tutor ##
     print('\nGenerando 1 Mensaje', re.compile('\(.*\)\,').split(lista_de_mensajes[0]['Texto mensaje']))
@@ -54,8 +55,8 @@ if __name__ == '__main__':
     escribir_excel(pandas_df, rutaynombre, 'General')
 
     # Genera y escribe hojas PARCIALES
-    generar_hojas_default(rutaynombre)  ## ORIGINALES
+    #generar_hojas_default(rutaynombre)  ## ORIGINALES
 
-    #generar_hojas_base(rutaynombre)
-    #generar_hojas_ampliada(rutaynombre)
+    generar_hojas_base(rutaynombre)
+    generar_hojas_ampliada(rutaynombre)
 
