@@ -105,4 +105,4 @@ def generar_archivos_cuerpo(input_file):
 
 
 if __name__ == '__main__':
-    generar_archivos_cuerpo(sys.argv[1])
+    generar_archivos_cuerpo_(sys.argv[1])
