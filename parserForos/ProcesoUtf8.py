@@ -9,6 +9,12 @@ Clase principal encargada llamar al parser y generar el archivo csv resultante
 
 import hashlib
 
+# VARIABLES GLOBALES #
+mensajes = []
+hilos = []
+usuarios = []
+asignaturas = []
+
 def month_string_to_number(string):
     m = {
         'ene': 1,
@@ -268,6 +274,11 @@ def generar_mensajes_base(ruta, id_asig):
 
 
 def generar_mensajes_ampliado(ruta, id_asig):
+    global mensajes
+
+    print('#######')
+    print('MENSAJES')
+    print('#######')
     with open(ruta, 'r', encoding='utf8') as f:
         lineas = f.readlines()
         lineas = [l.strip('\n') for l in lineas]
@@ -292,8 +303,7 @@ def generar_mensajes_ampliado(ruta, id_asig):
         mensaje_no = ''
 
         # Atributos Frecuentistas
-        # n_c_
-        # n_
+        # Mensaje
         size_padre = 0
         size_antecesor = 0
         size_ph = 0
@@ -311,9 +321,14 @@ def generar_mensajes_ampliado(ruta, id_asig):
         auto_respuesta = 0
         terminal = 0
 
-        hilo = 1
+        hilo = 0
+
+        # Hilo
 
         # Atributos Textuales
+        var_token = {}
+        var_raiz = {}
+        var_pos = {}
 
         for index, linea in enumerate(lineas):
 
@@ -365,8 +380,9 @@ def generar_mensajes_ampliado(ruta, id_asig):
                 if mensaje_no == "1":
                     tit_hilo = linea.partition('Título: ')[2]
                 tit_mensaje = linea.partition('Título: ')[2]
-
-            elif linea.startswith('----------------------------------------------------------------------'):
+            # ULTIMO MENSAJE DE CADA HILO: CIERRE DE HILO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            elif linea.startswith('----------------------------------------------------------------------') or \
+                    linea.startswith('==============================================================================='):
                 estado = 'FIN_MENSAJE'
                 if autor:
                     fecha_parser = fecha.split(' ')
@@ -375,7 +391,7 @@ def generar_mensajes_ampliado(ruta, id_asig):
                     hora = fecha_parser[4]
 
                     #######################
-                    # Tratamiento AMPLIADO
+                    # Tratamiento AMPLIADO de TEXTO
                     #######################
 
                     #
@@ -405,6 +421,7 @@ def generar_mensajes_ampliado(ruta, id_asig):
 
                     # Cuenta LINKS
                     n_links = 0
+                    n_links_r = 0
 
                     # Busca ADJUNTOS Y EMOJIS
                     if texto.find('[IMAGE:'):
@@ -412,16 +429,24 @@ def generar_mensajes_ampliado(ruta, id_asig):
                         # Busca [IMAGE:
                         regex = re.search(r'(\[IMAGE: .*\])', texto, re.M | re.I)
                         if regex != None:
-                            # Replace all [IMAGE:
-                            texto = re.sub(r'(\[IMAGE: .*\])', '[DATA: .XXX]', texto)
+                            # Reemplaza todos los ADJUNTOS Y EMOJIS [IMAGE: por [DATA:XXX]
+                            texto = re.sub(r'(\[IMAGE: .*\])', '[DATA]', texto)
                             print(regex.group(1))
                             print(texto)
                             # exit(12345567890)
 
                     # Busca LINKS (eliminados ADJUNTOS y EMOJIS)
                     if texto.find('http'):
+                        # Todos los http
                         n_links = len(re.findall(r'(http)', texto, re.M | re.I))
                         print('LINKS ENCONTRADOS: ', n_links)
+
+                    # Busca links
+                    n_links_r = len(re.findall(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''', texto, re.M | re.I))
+                    if n_links_r != 0:
+                        # Reemplaza todos los LINKS (http) (sin ADJUNTOS y EMOJIS)
+                        texto = re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''', '[LINK]', texto)
+                        print('LINKS REEMPLAZADOS: ', n_links_r, texto)
 
                     #
                     # DIFERENCIAS (len(nombre_foro) + len(tit_hilo) + len(tit_mensaje) + len(texto))
@@ -462,7 +487,7 @@ def generar_mensajes_ampliado(ruta, id_asig):
                         date_padre = datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S")  # fecha + ' ' + hora
 
                         # Padre-Hijo en días
-                        date_ph = abs(date_padre - date_padre)
+                        date_ph = abs(date_padre - date_padre).total_seconds()
                         # Antecesor-Sucesor en segundos
                         date_as = abs(date_padre - date_padre).total_seconds()
 
@@ -472,7 +497,7 @@ def generar_mensajes_ampliado(ruta, id_asig):
                     else:
 
                         # Padre-Hijo en días
-                        date_ph = abs(datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S") - date_padre)  # (fecha + ' ' + hora) - date_padre
+                        date_ph = abs(datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S") - date_padre).total_seconds()  # (fecha + ' ' + hora) - date_padre
 
                         # Antecesor-Sucesor en segundos
                         date_as = abs(datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S") - date_antecesor).total_seconds()  # (fecha + ' ' + hora) - date_antecesor
@@ -499,7 +524,7 @@ def generar_mensajes_ampliado(ruta, id_asig):
                         except NameError:
                             padre_hilo = id_autor
 
-                        inicial = 0
+                        inicial = 1
                         respuesta = 0  # 'inicial'
                         auto_respuesta = 0  # 'no'
                         terminal = 0  # 'sinrespuesta'
@@ -511,12 +536,12 @@ def generar_mensajes_ampliado(ruta, id_asig):
                         try:
                             n_mensajes_hilo = n_mensajes_hilo
                         except NameError:
-                            n_mensajes_hilo = 0
+                            n_mensajes_hilo = 1
 
-                        for i in range(0, n_mensajes_hilo, 1):
+                        for i in range(1, n_mensajes_hilo, 1):
                             # Mensaje único del hilo
                             # 0 'sinrespuesta'
-                            mensajes[len(mensajes) - (i+1)]['Terminal'] = -i
+                            mensajes[len(mensajes) - i]['Terminal'] = -i
 
                         # Mensaje INICIAL del Hilo
                         n_mensajes_hilo = 1
@@ -545,8 +570,31 @@ def generar_mensajes_ampliado(ruta, id_asig):
                         # TERMINAL
                         terminal = 0  # 'posible'
 
-                        # Mensaje RESPUESTA del Hilo
-                        n_mensajes_hilo = n_mensajes_hilo + 1
+                    #
+                    # ANÁLISIS de TEXTO
+                    #
+                    from procesadoGeneral import tokenizado
+                    from procesadoGeneral import enraizado
+                    from procesadoGeneral import postag
+
+                    var_token = tokenizado(texto.strip())
+                    print('TOKENIZADO(', n_mensajes_hilo, '): ', var_token)
+
+                    var_raiz = enraizado()
+                    print('RAICES: ', var_raiz)
+
+                    # var_pos = postag(texto.strip())
+                    # print('PoStag: ', var_pos)
+
+                    # exit(9999999)
+
+                    #
+                    # ANÁLISIS de TITULO DE EXTO ??????????????????????????????????????????????????????????????????????
+                    #
+
+                    # Actualización Nº
+                    # Mensaje RESPUESTA del Hilo
+                    n_mensajes_hilo = n_mensajes_hilo + 1
 
                     # mensaje=[tit_hilo, id_hilo, id_mensaje, id_ref_mensaje, id_autor,autor,  dia_semana, fecha, tit_mensaje, texto]
                     mensaje = {
@@ -563,34 +611,23 @@ def generar_mensajes_ampliado(ruta, id_asig):
                         'Distancia PH': date_ph, 'Distancia AS': date_as,
                         # DIFERENCIAS Padre-Hijo Antecesor-Sucesor
                         'Título mensaje': tit_mensaje, 'Caracteres título mensaje': len(tit_mensaje),
-                        'Diferncia PH': size_ph, 'Diferencia AS': size_as,
-                        # ANALISIS de TEXTO
                         'Texto mensaje': texto.strip(), 'Caracteres texto mensaje': len(texto),
-                        'Frases':  'nltk.tokenize.sent_tokenize',
-                        'Palabras': 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
+                        'Diferencia PH': size_ph, 'Diferencia AS': size_as,
+                        # ANÁLISIS de TEXTO
+                        # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
+                        'Tokens':  var_token,  # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras}
+                        "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'), 'ns': var_token.get('ns'),
+                        # .SnowballStemmer("spanish").stem,
+                        'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas}
+                        'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
+                        # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
+                        'Postag': var_pos,  # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
+                        'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
                         'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links
                     }
                     mensajes.append(mensaje)
+
                     ## Limpia variables
-                    texto = ""
-                    autor = ""
-                    # print(linea)
-            elif linea.startswith('==============================================================================='):
-                estado = 'FIN_MENSAJE'
-                if autor:
-                    fecha_parser = fecha.split(' ')
-                    dia_semana = fecha_parser[0]
-                    fecha = fecha_parser[1] + "/" + str(month_string_to_number(fecha_parser[2])) + "/" + fecha_parser[3]
-                    hora = fecha_parser[4].strip()
-                    # mensaje=[tit_hilo, id_hilo, id_mensaje, id_ref_mensaje, id_autor,autor,  dia_semana, fecha, tit_mensaje, texto]
-                    mensaje = {'Foro': id_foro, 'Nombre foro': nombre_foro, 'Asignatura': id_asig, 'Título': tit_hilo,
-                               'Hilo': id_hilo,
-                               'Mensaje': id_mensaje, 'Responde a': id_ref_mensaje,
-                               'Remitente': id_autor, 'Autor': autor, 'Día': dia_semana, 'Fecha': fecha, 'Hora': hora,
-                               'Date': fecha + ' ' + hora,
-                               'Título mensaje': tit_mensaje,
-                               'Texto mensaje': texto.strip(), 'Caracteres texto mensaje': len(texto)}
-                    mensajes.append(mensaje)
                     texto = ""
                     autor = ""
                     # print(linea)
@@ -604,15 +641,104 @@ def generar_mensajes_ampliado(ruta, id_asig):
     return mensajes
 
 
+## REPARTO x CAMPOS ##
+def partir_x_campo(lista, campo):
+    global mensajes
+    global hilos
+    global usuarios
+    global asignaturas
+
+    print('#######')
+    print('CAMPO')
+    print('#######')
+    destino = []
+    anterior = lista[0].get(campo)
+    #
+
+    print(lista)
+    jndex = 0
+    for index, li in enumerate(lista):
+        val = li.get(campo)
+        print(val)
+        if val != anterior:  # NUEVA INSTANCIA x CAMPO: Hilo, Remitente o Autor, Asignatura
+            anterior = val
+            jndex = jndex + 1
+            print(index, jndex)
+        destino.insert(jndex, li)
+
+    print(destino[3])
+    return destino
+
+## REPARTO x CAMPOS ##
+def repartir_x_campo(lista, campo):
+    global mensajes
+    global hilos
+    global usuarios
+    global asignaturas
+
+    print('#######')
+    print('CAMPO')
+    print('#######')
+    indice = {}
+    destino = []
+    destino2d = []
+    anterior = lista[0].get(campo)
+    #
+
+    print(lista)
+    jndex = 0
+    for index, li in enumerate(lista):
+        val = li.get(campo)
+        print(val)
+
+        destino2d['jo'] = 1
+
+
+    print(destino2d)
+    return destino2d
+
+
 ## PROCESADO HILOS ##
-def generar_hilos(ruta, id_asig):
+def generar_hilos(mensajes):
+    global hilos
+
+    print('#######')
+    print('HILOS')
+    print('#######')
     hilos = []
+    #
+
+    for index, mensaje in enumerate(mensajes):
+        print(index)
+        id_hilo = mensaje['Hilo']
+        if mensaje['Hilo']:
+            print(index)
+
     return hilos
 
 
 ## PROCESADO USUARIOS ##
-def generar_usuarios(ruta, id_asig):
+def generar_usuarios(mensajes, hilos):
+    global usuarios
+
+    print('#######')
+    print('USUARIOS')
+    print('#######')
     usuarios = []
+    #
     return usuarios
+
+
+## PROCESADO ASIGNATURAS ##
+def generar_asignaturas(mensajes, hilos, usuarios):
+    global asignaturas
+
+    print('#######')
+    print('ASIGNATIRAS')
+    print('#######')
+    asignaturas = []
+    #
+    return asignaturas
+
 # FIN Añadido FJSB
 
