@@ -36,7 +36,7 @@ def sum( arg1, arg2 ):
   # Add both the parameters and return them."
   total = arg1 + arg2
   print ("Inside the function : ", total)
-  return total;
+  return total
 
 data = "All work and no play makes jack dull boy. All work and no play makes jack a dull boy."
 mensaje = "All work and no play makes jack dull boy. All work and no play makes jack a dull boy. Mierda para tu puta madre. Caca de la vaca, para el resto"
