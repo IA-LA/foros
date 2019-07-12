@@ -10,7 +10,7 @@ Clase principal encargada llamar al parser y generar el archivo csv resultante
 import hashlib
 
 # VARIABLES GLOBALES #
-mensajes = []
+# mensajes = []
 hilos = []
 usuarios = []
 asignaturas = []
@@ -767,6 +767,8 @@ def generar_hilos(mensajes, campo):
         respuesta = mensaje['Respuesta']
         auto_respuesta = mensaje['Auto-respuesta']
         autor = mensaje['Remitente']
+        # ULTIMO MENSAJE DEL HILO
+        terminal = mensaje['Terminal']
         # LONGITUD #
         longitud += mensaje['Caracteres texto mensaje']
         # Nº MENSAJES #
@@ -786,18 +788,18 @@ def generar_hilos(mensajes, campo):
                 # DISTANCIA
                 distancia += 1
 
-                # MENSAJE INICIAL Nuevo SUBHILO
+                # MENSAJE Nuevo SUBHILO
                 if cambia_subhilo * respuesta < 0:
                     print(index, id_hilo, 'Nuevo SUBHILOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO', respuesta, n_subhilos)
                     cambia_subhilo = cambia_subhilo * -1
                     n_subhilos += 1
-                    n_mensajes_medio_subhilo += -(mensaje['Terminal'])
+                    n_mensajes_medio_subhilo += -(terminal)
 
                 # MENSAJES MISMO HILO #
                 else:
                     print(index, id_hilo, 'Mensaje de tipo respuesta') # ,'Mensaje de tipo respuesta del mismo subhilo', respuesta)
-                    # Ultimo mensaje del hilo
-                    if mensaje['Terminal'] == -1:
+                    # ULTIMO MENSAJE DEL HILO
+                    if terminal == -1:
                         # LONGITUD MEDIA #
                         longitud_media += longitud/n_mensajes
                         # DISTANCIA y DISTANCIA MEDIA #
@@ -806,58 +808,63 @@ def generar_hilos(mensajes, campo):
                         # MENSAJES x SUBHILO
                         n_mensajes_medio_subhilo = n_mensajes_medio_subhilo/n_mensajes
 
-                        ########################
-                        # Derfinición de HILO
-                        ########################
-                        # hilo = [tit_hilo, id_hilo, dia_semana, fecha, n_mensajes, n_autores, n_subhilos, n_auto_respuestas, longitud, distancia, longitud_media, distancia_media]
-                        hilo = {
-                            # BASE #
-                            # MENSAJES #
-                                'Asignatura': mensaje['Asignatura'],
-                                'Foro': mensaje['Foro'], 'Nombre foro': mensaje['Nombre foro'], 'Caracteres foro': mensaje['Caracteres foro'],
-                                'Hilo': mensaje['Hilo'], 'Título': mensaje['Título'], 'Caracteres hilo': mensaje['Caracteres hilo'],
-                            'Núnero mensajes': n_mensajes,
-                            'Núnero auto-respuestas': n_auto_respuestas,
-                            'Núnero subhilos': n_subhilos,
-                            #    'Mensaje': id_mensaje, 'Responde a': id_ref_mensaje,
-                            #    'Remitente': id_autor, 'Autor': autor,
-                            # TIPO INICIAL, TERMINAL, RESPUESTA Y AUTO-RESPUESTA
-                            #    'Inicial': inicial, 'Respuesta': respuesta, 'Auto-respuesta': auto_respuesta, 'Terminal': terminal,
-                            # DISTANCIAS Padre-Hijo Antecesor-Sucesor
-                            #    'Día': dia_semana, 'Fecha': fecha, 'Hora': hora,
-                            'Date': mensaje['Fecha'] + ' ' + mensaje['Hora'],
-                            #    'Distancia PH': date_ph, 'Distancia AS': date_as,
-                            # DIFERENCIAS Padre-Hijo Antecesor-Sucesor
-                            #    'Título mensaje': tit_mensaje, 'Caracteres título mensaje': len(tit_mensaje),
-                            #    'Texto mensaje': texto.strip(), 'Caracteres texto mensaje': len(texto),
-                            #    'Diferencia PH': size_ph, 'Diferencia AS': size_as,
-                            # ANÁLISIS de TEXTO
-                            # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
-                            #    'Tokens': var_token,
-                            # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras}
-                            #    "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'),
-                            #    'ns': var_token.get('ns'),
-                            # .SnowballStemmer("spanish").stem,
-                            #    'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas}
-                            #    'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
-                            # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
-                            #    'Postag': var_pos,
-                            # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
-                            #    'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
-                            #    'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links
-                        }
-                        # INICIALIZAR AUTORES #
-                        autores_previos = []
-                        # INICIALIZAR CONTADORES HILO #
-                        longitud = 0
-                        n_mensajes = 0
-
-                        # AÑADIR HILO #
-                        hilos.append(hilo)
+        # MENSAJE CABECERA HILO #
         # CAMBIO DE HILO #
         else:
             print(index, id_hilo, 'Nuevo HILOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO', respuesta)
             id_hilo_anterior = id_hilo
+            # ULTIMO MENSAJE DEL HILO
+
+        if terminal == -1:
+            ########################
+            # Derfinición de HILO
+            ########################
+            # hilo = [tit_hilo, id_hilo, dia_semana, fecha, n_mensajes, n_autores, n_subhilos, n_auto_respuestas, longitud, distancia, longitud_media, distancia_media]
+            hilo = {
+                # BASE #
+                # MENSAJES #
+                'Asignatura': mensaje['Asignatura'],
+                'Foro': mensaje['Foro'], 'Nombre foro': mensaje['Nombre foro'],
+                'Caracteres foro': mensaje['Caracteres foro'],
+                'Hilo': mensaje['Hilo'], 'Título': mensaje['Título'], 'Caracteres hilo': mensaje['Caracteres hilo'],
+                'Núnero mensajes': n_mensajes,
+                'Núnero auto-respuestas': n_auto_respuestas,
+                'Núnero subhilos': n_subhilos,
+                #    'Mensaje': id_mensaje, 'Responde a': id_ref_mensaje,
+                #    'Remitente': id_autor, 'Autor': autor,
+                # TIPO INICIAL, TERMINAL, RESPUESTA Y AUTO-RESPUESTA
+                #    'Inicial': inicial, 'Respuesta': respuesta, 'Auto-respuesta': auto_respuesta, 'Terminal': terminal,
+                # DISTANCIAS Padre-Hijo Antecesor-Sucesor
+                #    'Día': dia_semana, 'Fecha': fecha, 'Hora': hora,
+                'Date': mensaje['Fecha'] + ' ' + mensaje['Hora'],
+                #    'Distancia PH': date_ph, 'Distancia AS': date_as,
+                # DIFERENCIAS Padre-Hijo Antecesor-Sucesor
+                #    'Título mensaje': tit_mensaje, 'Caracteres título mensaje': len(tit_mensaje),
+                #    'Texto mensaje': texto.strip(), 'Caracteres texto mensaje': len(texto),
+                #    'Diferencia PH': size_ph, 'Diferencia AS': size_as,
+                # ANÁLISIS de TEXTO
+                # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
+                #    'Tokens': var_token,
+                # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras}
+                #    "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'),
+                #    'ns': var_token.get('ns'),
+                # .SnowballStemmer("spanish").stem,
+                #    'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas}
+                #    'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
+                # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
+                #    'Postag': var_pos,
+                # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
+                #    'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
+                #    'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links
+            }
+            # INICIALIZAR AUTORES #
+            autores_previos = []
+            # INICIALIZAR CONTADORES HILO #
+            longitud = 0
+            n_mensajes = 0
+
+            # AÑADIR HILO #
+            hilos.append(hilo)
 
     print(hilos)
     return hilos

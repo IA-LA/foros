@@ -20,22 +20,22 @@
                 \           |   \                                                            |                
                   \         |    \                                                           |
                     \       |     \                                                          |                  
-      Características -- Mensaje -------------- [Hilo]                                   Clustering
-                     /   =======  /              ====                                    ==========
-                   /        |    /                 |--- Caracteristicas                      |
-                 /          |   /                       ===============                      |
-               /            |  /                               |                             |
-             /           Usuario                               |                             |
-         Texto           =======                    Aprendizaje Automático __________________|
-           |                                        ======================              |
-           |_______ Analisis NLP                                                   Clasificacion
-                    ============        _________________________________________  =============
-                        |              /      |                                          |
-                        |             /       |                                          | 
-          ______________|____________/________|                         _________________|________...__
-         |        |        |        |         |                        |           |         |   |     |
-     tokenizado  raices   postag  genero  sentimiento              NaïveBayes  NaïveBayes+  AD  SVM   ...
-     ----------  ------   ------  ------  -----------              ---------   -----------  --  ---
+      Características -- Mensaje __\____________ [Hilo] ________                          Clustering
+                     /   =======   /              ====          |                         ==========
+                   /        |     /                      Caracteristicas                      |
+                 /          |    /                       ===============                      |
+               /            |   /                               |                             |
+             /           Usuario                                |                             |
+         Texto           =======                     Aprendizaje Automático __________________|
+           |                                         ======================              |
+           |_______ Analisis NLP                                                         |
+                    ============                    _______________________________ Clasificacion
+                        |                          /      |                         =============
+                        |                         /       |                              | 
+          ______________|_______________________ /________|                         _____|_____________________...__
+         |   |     |    |           |           |         |                        |           |         |   |     |
+     token  raíz  PoS  Freq.D.  Topic Mod.   genero  sentimiento              NaïveBayes  NaïveBayes+  AD  SVM   ...
+     -----  ----  ---  -------  ---------    ------  -----------
 
 ## Tabla de datos base
 | Asignatura    | Foro          | Usuario   | Mensaje   | Hilo      |

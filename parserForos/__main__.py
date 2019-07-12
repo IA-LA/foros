@@ -45,6 +45,10 @@ if __name__ == '__main__':
     partir_x_campo(lista_de_mensajes, 'Foro')
     generar_hilos(lista_de_mensajes, 'Hilo')
 
+    ########################
+    # exit(0)
+    ########################
+
     # # 2. LIMPIEZA de Mensajes ([IMAGE: ] y FOROS Profesor-Tutor # #
     print('\nGenerando 1 Mensaje', re.compile('\(.*\)\,').split(lista_de_mensajes[0]['Texto mensaje']))
     ## limpiarImagenMensaje('[IMAGE:.')
@@ -54,8 +58,8 @@ if __name__ == '__main__':
     # # .CSV # #
     print('\nGenerando 1 .CSV', rutaynombre, lista_de_mensajes[0])
     #rutaynombreyextensionCsv = generar_csv(rutaynombre, lista_de_mensajes)
-    rutaynombreyextensionCsv_mensajes = generar_csv(rutaynombre, lista_de_mensajes)
-    rutaynombreyextensionCsv_hilos = generar_csv(rutaynombre, lista_de_hilos)
+    rutaynombreyextensionCsv_mensajes = generar_csv(rutaynombre + '_mensajes', lista_de_mensajes)
+    rutaynombreyextensionCsv_hilos = generar_csv(rutaynombre + '_hilos', lista_de_hilos)
     #rutaynombreyextensionCsv_autores = generar_csv(rutaynombre, lista_de_autores)
     #rutaynombreyextensionCsv_asignaturas = generar_csv(rutaynombre, lista_de_asignaturas)
 
