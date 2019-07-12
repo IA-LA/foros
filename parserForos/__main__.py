@@ -35,12 +35,15 @@ if __name__ == '__main__':
     print('Generando 1', rutaynombreUtf8, id_asignatura)
     # lista_de_mensajes = generar_mensajes_base(rutaynombreUtf8, id_asignatura)
     lista_de_mensajes = generar_mensajes_ampliado(rutaynombreUtf8, id_asignatura)
+    lista_de_hilos = generar_hilos(lista_de_mensajes, 'Hilo')
+    #lista_de_autores = generar_autores(lista_de_mensajes, lista_de_hilos, 'Autores')
+    #lista_de_asignaturas = generar_asignaturas(lista_de_mensajes, lista_de_hilos, lista_de_autores, 'Asignaturas')
 
     partir_x_campo(lista_de_mensajes, 'Hilo')
     #repartir_x_campo(lista_de_mensajes, 'Remitente')
     # repartir_x_campo(lista_de_mensajes, 'Asignatura')
     partir_x_campo(lista_de_mensajes, 'Foro')
-    exit(0)
+    generar_hilos(lista_de_mensajes, 'Hilo')
 
     # # 2. LIMPIEZA de Mensajes ([IMAGE: ] y FOROS Profesor-Tutor # #
     print('\nGenerando 1 Mensaje', re.compile('\(.*\)\,').split(lista_de_mensajes[0]['Texto mensaje']))
@@ -52,7 +55,7 @@ if __name__ == '__main__':
     print('\nGenerando 1 .CSV', rutaynombre, lista_de_mensajes[0])
     #rutaynombreyextensionCsv = generar_csv(rutaynombre, lista_de_mensajes)
     rutaynombreyextensionCsv_mensajes = generar_csv(rutaynombre, lista_de_mensajes)
-    #rutaynombreyextensionCsv_hilos = generar_csv(rutaynombre, lista_de_hilos)
+    rutaynombreyextensionCsv_hilos = generar_csv(rutaynombre, lista_de_hilos)
     #rutaynombreyextensionCsv_autores = generar_csv(rutaynombre, lista_de_autores)
     #rutaynombreyextensionCsv_asignaturas = generar_csv(rutaynombre, lista_de_asignaturas)
 
@@ -60,7 +63,7 @@ if __name__ == '__main__':
     print('\nGenerando 1 Pandas DATA FRAME del .CSV', rutaynombreyextensionCsv_mensajes)
     # pandas_df = generar_df(rutaynombreyextensionCsv)
     pandas_df_mensajes = generar_df(rutaynombreyextensionCsv_mensajes)
-    # pandas_df_hilos = generar_df(rutaynombreyextensionCsv_hilos)
+    pandas_df_hilos = generar_df(rutaynombreyextensionCsv_hilos)
     # pandas_df_autores = generar_df(rutaynombreyextensionCsv_autores)
     # pandas_df_asignaturas = generar_df(rutaynombreyextensionCsv_asignaturas)
 
@@ -70,7 +73,7 @@ if __name__ == '__main__':
     # escribir_excel(pandas_df, rutaynombre, 'General')
     # Escribe hoja de características GENERAL
     escribir_excel(pandas_df_mensajes, rutaynombre + '_caracteristicas', 'Mensajes')
-    # escribir_excel(pandas_df_hilos, rutaynombre + '_caracteristicas', 'Hilos')
+    escribir_excel(pandas_df_hilos, rutaynombre + '_caracteristicas', 'Hilos')
     # escribir_excel(pandas_df_autores, rutaynombre + '_caracteristicas', 'Autores')
     # escribir_excel(pandas_df_asignaturas, rutaynombre + '_caracteristicas', 'Asignaturas')
 

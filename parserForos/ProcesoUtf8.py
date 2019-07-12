@@ -233,6 +233,9 @@ def generar_mensajes_base(ruta, id_asig):
                     dia_semana = fecha_parser[0]
                     fecha = fecha_parser[1] + "/" + str(month_string_to_number(fecha_parser[2])) + "/" + fecha_parser[3]
                     hora = fecha_parser[4]
+                    ########################
+                    # Derfinición de MENSAJE (base)
+                    ########################
                     # mensaje=[tit_hilo, id_hilo, id_mensaje, id_ref_mensaje, id_autor,autor,  dia_semana, fecha, tit_mensaje, texto]
                     mensaje = {'Foro': id_foro, 'ForoN': nombre_foro, 'Asignatura': id_asig, 'Título': tit_hilo,
                                'Hilo': id_hilo,
@@ -251,6 +254,9 @@ def generar_mensajes_base(ruta, id_asig):
                     dia_semana = fecha_parser[0]
                     fecha = fecha_parser[1] + "/" + str(month_string_to_number(fecha_parser[2])) + "/" + fecha_parser[3]
                     hora = fecha_parser[4].strip()
+                    ########################
+                    # Derfinición de MENSAJE (base)
+                    ########################
                     # mensaje=[tit_hilo, id_hilo, id_mensaje, id_ref_mensaje, id_autor,autor,  dia_semana, fecha, tit_mensaje, texto]
                     mensaje = {'Foro': id_foro, 'ForoN': nombre_foro, 'Asignatura': id_asig, 'Título': tit_hilo,
                                'Hilo': id_hilo,
@@ -518,6 +524,9 @@ def generar_mensajes_ampliado(ruta, id_asig):
 
                         # Define PADRE HILO
                         # controla si son auto-respuestas o participantes distintos
+
+                        # Excepción:
+                        # Si la variable 'padre_hilo' no exite la inicializa
                         try:
                             padre_hilo = padre_hilo
                             padre_hilo = id_autor
@@ -533,6 +542,9 @@ def generar_mensajes_ampliado(ruta, id_asig):
                         # si un menssaje es Inicial
                         # revisa los anteriores (-1,-2,-3,-4,...)
                         # anotándoles como Terminal
+
+                        # Excepción:
+                        # Si la variable 'n_mensajes_hilo' no exite la inicializa
                         try:
                             n_mensajes_hilo = n_mensajes_hilo
                         except NameError:
@@ -596,6 +608,9 @@ def generar_mensajes_ampliado(ruta, id_asig):
                     # Mensaje RESPUESTA del Hilo
                     n_mensajes_hilo = n_mensajes_hilo + 1
 
+                    ########################
+                    # Derfinición de MENSAJE (ampliado)
+                    ########################
                     # mensaje=[tit_hilo, id_hilo, id_mensaje, id_ref_mensaje, id_autor,autor,  dia_semana, fecha, tit_mensaje, texto]
                     mensaje = {
                         # BASE #
@@ -652,7 +667,9 @@ def partir_x_campo(lista, campo):
     print('CAMPO')
     print('#######')
     destino = []
-    anterior = lista[0].get(campo)
+    # Valor inicial del CAMPO de partición
+    # y del campo anterior
+    campo_anterior = lista[0].get(campo)
     #
 
     print(lista)
@@ -660,14 +677,15 @@ def partir_x_campo(lista, campo):
     for index, li in enumerate(lista):
         val = li.get(campo)
         print(val)
-        if val != anterior:  # NUEVA INSTANCIA x CAMPO: Hilo, Remitente o Autor, Asignatura
-            anterior = val
+        if val != campo_anterior:  # NUEVA INSTANCIA x CAMPO: Hilo, Remitente o Autor, Asignatura
+            campo_anterior = val
             jndex = jndex + 1
             print(index, jndex)
         destino.insert(jndex, li)
 
     print(destino[3])
     return destino
+
 
 ## REPARTO x CAMPOS ##
 def repartir_x_campo(lista, campo):
@@ -682,7 +700,7 @@ def repartir_x_campo(lista, campo):
     indice = {}
     destino = []
     destino2d = []
-    anterior = lista[0].get(campo)
+    campo_anterior = lista[0].get(campo)
     #
 
     print(lista)
@@ -699,26 +717,154 @@ def repartir_x_campo(lista, campo):
 
 
 ## PROCESADO HILOS ##
-def generar_hilos(mensajes):
+def generar_hilos(mensajes, campo):
     global hilos
 
     print('#######')
     print('HILOS')
     print('#######')
     hilos = []
+    # Valor inicial del CAMPO de partición
+    # anterior = mensajes[0].get(campo)
+
+    # Excepción:
+    # Si la variable 'id_hilo_anterior' no exite la inicializa
+    # Si la variable 'cambia_subhilo' no exite la inicializa (vale 1: si es el mismo subhilo, vale -1: si cambia el subhilo)
+    try:
+        id_hilo_anterior
+        # interruptor de cambio de hilo #
+        cambia_subhilo
+    except NameError:
+        print("well, it WASN'T defined after all!")
+        id_hilo_anterior = mensajes[0].get(campo)
+        cambia_subhilo = 1
+    else:
+        print("sure, it was defined.")
     #
 
-    for index, mensaje in enumerate(mensajes):
-        print(index)
-        id_hilo = mensaje['Hilo']
-        if mensaje['Hilo']:
-            print(index)
+    # Variables Globales
+    autores_previos = []
+    # Totales
+    n_mensajes = 0
+    n_autores = 0
+    n_subhilos = 0
+    n_auto_respuestas = 0
+    longitud = 0  # Tamaño texto
+    distancia = 0  # Duración
+    longitud_media = 0.0  # Tamaño
+    distancia_media = 0.0  # Duración
 
+    # Medias
+    n_mensajes_medio_subhilo = 0
+
+    # Cuantitativos
+    mensaje_mas_respondido_del_hilo = "¿CUÁL SERÁ?"
+    autor_mas_respondedor_del_hilo = "¿CUÁL SERÁ?"
+
+    # PARA CADA MENSAJE #
+    for index, mensaje in enumerate(mensajes):
+        id_hilo = mensaje[campo]
+        respuesta = mensaje['Respuesta']
+        auto_respuesta = mensaje['Auto-respuesta']
+        autor = mensaje['Remitente']
+        # LONGITUD #
+        longitud += mensaje['Caracteres texto mensaje']
+        # Nº MENSAJES #
+        n_mensajes += 1
+        # AUTORES DISTINTOS #
+        if autor not in autores_previos:
+            autores_previos.append(autor)
+            n_autores += 1
+        # AUTO-RESPUESTAS DEL HILO DE MENSAJES
+        if auto_respuesta != 0:
+            n_auto_respuestas += 1
+
+        # MENSAJES DEL MISMO HILO
+        if id_hilo_anterior == id_hilo:
+            # MENSAJES RESPUESTA #
+            if respuesta != 0:
+                # DISTANCIA
+                distancia += 1
+
+                # MENSAJE INICIAL Nuevo SUBHILO
+                if cambia_subhilo * respuesta < 0:
+                    print(index, id_hilo, 'Nuevo SUBHILOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO', respuesta, n_subhilos)
+                    cambia_subhilo = cambia_subhilo * -1
+                    n_subhilos += 1
+                    n_mensajes_medio_subhilo += -(mensaje['Terminal'])
+
+                # MENSAJES MISMO HILO #
+                else:
+                    print(index, id_hilo, 'Mensaje de tipo respuesta') # ,'Mensaje de tipo respuesta del mismo subhilo', respuesta)
+                    # Ultimo mensaje del hilo
+                    if mensaje['Terminal'] == -1:
+                        # LONGITUD MEDIA #
+                        longitud_media += longitud/n_mensajes
+                        # DISTANCIA y DISTANCIA MEDIA #
+                        distancia = mensaje['Distancia PH']
+                        distancia_media += distancia/n_mensajes
+                        # MENSAJES x SUBHILO
+                        n_mensajes_medio_subhilo = n_mensajes_medio_subhilo/n_mensajes
+
+                        ########################
+                        # Derfinición de HILO
+                        ########################
+                        # hilo = [tit_hilo, id_hilo, dia_semana, fecha, n_mensajes, n_autores, n_subhilos, n_auto_respuestas, longitud, distancia, longitud_media, distancia_media]
+                        hilo = {
+                            # BASE #
+                            # MENSAJES #
+                                'Asignatura': mensaje['Asignatura'],
+                                'Foro': mensaje['Foro'], 'Nombre foro': mensaje['Nombre foro'], 'Caracteres foro': mensaje['Caracteres foro'],
+                                'Hilo': mensaje['Hilo'], 'Título': mensaje['Título'], 'Caracteres hilo': mensaje['Caracteres hilo'],
+                            'Núnero mensajes': n_mensajes,
+                            'Núnero auto-respuestas': n_auto_respuestas,
+                            'Núnero subhilos': n_subhilos,
+                            #    'Mensaje': id_mensaje, 'Responde a': id_ref_mensaje,
+                            #    'Remitente': id_autor, 'Autor': autor,
+                            # TIPO INICIAL, TERMINAL, RESPUESTA Y AUTO-RESPUESTA
+                            #    'Inicial': inicial, 'Respuesta': respuesta, 'Auto-respuesta': auto_respuesta, 'Terminal': terminal,
+                            # DISTANCIAS Padre-Hijo Antecesor-Sucesor
+                            #    'Día': dia_semana, 'Fecha': fecha, 'Hora': hora,
+                            'Date': mensaje['Fecha'] + ' ' + mensaje['Hora'],
+                            #    'Distancia PH': date_ph, 'Distancia AS': date_as,
+                            # DIFERENCIAS Padre-Hijo Antecesor-Sucesor
+                            #    'Título mensaje': tit_mensaje, 'Caracteres título mensaje': len(tit_mensaje),
+                            #    'Texto mensaje': texto.strip(), 'Caracteres texto mensaje': len(texto),
+                            #    'Diferencia PH': size_ph, 'Diferencia AS': size_as,
+                            # ANÁLISIS de TEXTO
+                            # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
+                            #    'Tokens': var_token,
+                            # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras}
+                            #    "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'),
+                            #    'ns': var_token.get('ns'),
+                            # .SnowballStemmer("spanish").stem,
+                            #    'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas}
+                            #    'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
+                            # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
+                            #    'Postag': var_pos,
+                            # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
+                            #    'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
+                            #    'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links
+                        }
+                        # INICIALIZAR AUTORES #
+                        autores_previos = []
+                        # INICIALIZAR CONTADORES HILO #
+                        longitud = 0
+                        n_mensajes = 0
+
+                        # AÑADIR HILO #
+                        hilos.append(hilo)
+        # CAMBIO DE HILO #
+        else:
+            print(index, id_hilo, 'Nuevo HILOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO', respuesta)
+            id_hilo_anterior = id_hilo
+
+    print(hilos)
     return hilos
 
 
 ## PROCESADO USUARIOS ##
-def generar_usuarios(mensajes, hilos):
+def generar_usuarios(mensajes, hilos, campo):
     global usuarios
 
     print('#######')
@@ -730,7 +876,7 @@ def generar_usuarios(mensajes, hilos):
 
 
 ## PROCESADO ASIGNATURAS ##
-def generar_asignaturas(mensajes, hilos, usuarios):
+def generar_asignaturas(mensajes, hilos, usuarios, campo):
     global asignaturas
 
     print('#######')
