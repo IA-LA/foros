@@ -1,12 +1,12 @@
 # foros
-- Foros anotados
-- Nltk (frase, palabra, raíz, PoS, género, sentimiento, ant/sinónimo, lematization, n-grama)
-- Modelado supervisado de agrupamiento y clasificación
+- Foros anotados (Corpus)
+- PLN: Nltk (a nivel de frase, palabra, raíz, PoS, género, sentimiento, ant/sinónimo, lematization, n-gramas)
+- Aprendizaje Automático: modelado supervisado de agrupamiento y clasificación
 
 # parserForos
 - Fuentes foros
-- Extración de información
-- Características cuantitivas y cualitativas del HILO (en base a Foro, Mensaje y Autor)
+- Extración de información (RI)
+- Características cuantitivas y cualitativas del HILO (en base a Asignatura, Foro, Mensaje y Autor)
 
 # Diagrama de Clases:
           
@@ -24,12 +24,12 @@
                      /   =======  /              ====                                    ==========
                    /        |    /                 |--- Caracteristicas                      |
                  /          |   /                       ===============                      |
-               /            |  /                               |_____________________________|
-             /           Usuario                               |
-         Texto           =======                               |
-           |                                                   | 
-           |_______ Analisis                                   |_________________  Clasificacion
-                    ========            _________________________________________  =============
+               /            |  /                               |                             |
+             /           Usuario                               |                             |
+         Texto           =======                    Aprendizaje Automático __________________|
+           |                                        ======================              |
+           |_______ Analisis NLP                                                   Clasificacion
+                    ============        _________________________________________  =============
                         |              /      |                                          |
                         |             /       |                                          | 
           ______________|____________/________|                         _________________|________...__
@@ -37,9 +37,9 @@
      tokenizado  raices   postag  genero  sentimiento              NaïveBayes  NaïveBayes+  AD  SVM   ...
      ----------  ------   ------  ------  -----------              ---------   -----------  --  ---
 
-## Tabla de datos
-| Asinatura     | Foro          | Usuario   | Mensaje   | Hilo      |
-| ------------- | :------------:| :--------:| :-------- | :--------:|
+## Tabla de datos base
+| Asignatura    | Foro          | Usuario   | Mensaje   | Hilo      |
+| ------------: | --------------| :--------:| --------- | :--------:|
 | nombre        | título        | id        | texto     | id        |
 | nombre        | título        | id        | texto     | id        |
 | nombre        | título        | id        | texto     | id        |
