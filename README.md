@@ -6,7 +6,7 @@
 # parserForos
 - Fuentes foros
 - Extración de información (RI)
-- Características cuantitivas y cualitativas del HILO (en base a Asignatura, Foro, Mensaje y Autor)
+- Extracción de características cuantitivas y cualitativas del HILO (en base a Asignatura, Foro, Mensaje y Autor)
 
 # Diagrama de Clases:
           
