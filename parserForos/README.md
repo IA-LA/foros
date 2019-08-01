@@ -19,13 +19,13 @@ FOROS 2017-18
 | 62011037 | Foros-Introducción-Análisis-de-Datos_2017-18.txt       | Introducción al Análisis de Datos                | Psicología       |
 
 
-MODULOS (GESTION)
+MODULOS (GESTION DE)
 -------
-C:\> 
-C:\> pip list
-C:\> pip freeze
-C:\> pip freeze > requirements.txt
-C:\> pip install -r requirements.txt
+* C:\> 
+* C:\> pip list
+* C:\> pip freeze
+* C:\> pip freeze > requirements.txt
+* C:\> pip install -r requirements.txt
 
 
 
