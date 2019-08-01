@@ -3,13 +3,13 @@ Created on 31-07-2019
 
 @author: FJSB
 
-Opciones de ejecución del script en base a los parámetros de la línea de comandos
+Opciones de ejecución del script en base a los parámetros de la línea de comandos sys.argv
 
     - 2 parámetros: (ejecuta sobre un único fichero SIN información en el nombre)
         # FICHERO         sys.argv[1]:    "D:\ruta\nombre.txt"
         # ID-ASIGNATURA   sys.argv[2]:    "71901037"
 
-    - 1 parámetro: (ejecuta sobre un único fichero CON información aparte del nombre separada por guiones bajos cuádruples '___')
+    - 1 parámetro: (ejecuta sobre un único fichero CON información aparte del nombre con guiones bajos cuádruples '___')
         # FICHERO         sys.argv[1]:    "D:\ruta\nombre____ABRV____ID____AÑO.txt"
             - ABRV : nombre corto de la asignatura
             - ID   : identificador UNED de la asignatura
@@ -51,7 +51,9 @@ def filtrar_parametros(parametros):
         # Argumento 2: ID asignatura
         id_asignatura = parametros[2]
 
-        return [{'tipo': n, 'rutaynombre': rutaynombre, 'rutaynombreyextensionTxt': rutaynombreyextensionTxt, 'id_asignatura': id_asignatura, 'abreviatura': None, 'año': None}]
+        return [{'tipo': n, 'rutaynombre': rutaynombre,
+                 'rutaynombreyextensionTxt': rutaynombreyextensionTxt,
+                 'id_asignatura': id_asignatura, 'abreviatura': None, 'año': None}]
 
     # 1 parámetro
     elif n == 2:
@@ -76,7 +78,9 @@ def filtrar_parametros(parametros):
             curso = nombre[3]
 
             print(nombre, abrv, id_asig, curso)
-            ficheros.append({'tipo': n, 'rutaynombre': rutaynombre, 'rutaynombreyextensionTxt': rutaynombreyextensionTxt, 'id_asignatura': id_asig, 'abreviatura': abrv, 'año': curso})
+            ficheros.append({'tipo': n, 'rutaynombre': rutaynombre,
+                             'rutaynombreyextensionTxt': rutaynombreyextensionTxt,
+                             'id_asignatura': id_asig, 'abreviatura': abrv, 'año': curso})
 
         # FICHERO       : D:\ruta\
         else:
@@ -126,29 +130,3 @@ def filtrar_parametros(parametros):
             print(ficheros)
 
         return ficheros
-    # 0 parámetros
-    elif n == 1:
-        print('0 Parámetros')
-        return []
-
-    # Argumento 1.0: ruta + nombre
-    rutaynombre = os.path.splitext(parametros[1])[1]
-    # Argumento 1: ruta + nombre + extensión
-    rutaynombreyextensionTxt = parametros[1]
-
-    if os.path.splitext(parametros[1])[1] != None:
-        nombre = os.path.split(parametros)[1]
-
-    print(rutaynombre, nombre)
-    exit(0)
-
-    filtrar_parametros(sys.argv)
-
-    nombre = os.path.split(rutaynombre)[1]
-    abr_nombre = nombre.split('_')[1]
-    id_nombre = nombre.split('_')[2]
-    ano_nombre = nombre.split('_')[3]
-    print(nombre, abr_nombre, id_nombre, ano_nombre)
-    exit(0)
-
-    return parametros
