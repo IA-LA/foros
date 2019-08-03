@@ -55,9 +55,9 @@ if __name__ == '__main__':
 
         # # ARBOLES # #
         # generar_arbol_default(info[0], 'Mensaje',  'Respuesta')
-        # generar_arbol_default(info[0], 'Mensaje', 'Responde a')
-        # generar_arbol(info[0], 'Mensaje', 'Responde a')
-        # generar_arbol(info[0], 'Mensaje', 'Respuesta')
+        generar_arbol_default(info[0], 'Mensaje', 'Responde a')
+        # generar_arbol(info[0], 'Mensaje', 'Responde a', 0)
+        generar_arbol(info[0], 'Mensaje', 'Respuesta', 0)
         ########################
         # exit(0)
         ########################
@@ -74,15 +74,15 @@ if __name__ == '__main__':
         #rutaynombreyextensionCsv = generar_csv(rutaynombre, lista_de_mensajes)
         rutaynombreyextensionCsv_mensajes = generar_csv(fichero.rutaynombre + '_mensajes', lista_de_mensajes)
         rutaynombreyextensionCsv_hilos = generar_csv(fichero.rutaynombre + '_hilos', lista_de_hilos)
-        #rutaynombreyextensionCsv_autores = generar_csv(rutaynombre, lista_de_autores)
-        #rutaynombreyextensionCsv_asignaturas = generar_csv(rutaynombre, lista_de_asignaturas)
+        rutaynombreyextensionCsv_autores = generar_csv(fichero.rutaynombre + '_autores', lista_de_autores)
+        #rutaynombreyextensionCsv_asignaturas = generar_csv(fichero.rutaynombre + '_asignaturas', lista_de_asignaturas)
 
         # # Pandas DATA FRAME # #
         print('\nGenerando 1 Pandas DATA FRAME del .CSV', rutaynombreyextensionCsv_mensajes)
         # pandas_df = generar_df(rutaynombreyextensionCsv)
         pandas_df_mensajes = generar_df(rutaynombreyextensionCsv_mensajes)
         pandas_df_hilos = generar_df(rutaynombreyextensionCsv_hilos)
-        # pandas_df_autores = generar_df(rutaynombreyextensionCsv_autores)
+        pandas_df_autores = generar_df(rutaynombreyextensionCsv_autores)
         # pandas_df_asignaturas = generar_df(rutaynombreyextensionCsv_asignaturas)
 
         # # .XSLX # #
@@ -92,7 +92,7 @@ if __name__ == '__main__':
         # Escribe hoja de características GENERAL
         escribir_excel(pandas_df_mensajes, fichero.rutaynombre + '_caracteristicas', 'Mensajes')
         escribir_excel(pandas_df_hilos, fichero.rutaynombre + '_caracteristicas', 'Hilos')
-        # escribir_excel(pandas_df_autores, fichero.rutaynombre + '_caracteristicas', 'Autores')
+        escribir_excel(pandas_df_autores, fichero.rutaynombre + '_caracteristicas', 'Autores')
         # escribir_excel(pandas_df_asignaturas, fichero.rutaynombre + '_caracteristicas', 'Asignaturas')
 
         # Genera y escribe hojas PARCIALES

@@ -153,6 +153,7 @@ def generar_mensajes_default(ruta, id_asig):
 
 
 # INICIO Añadido FJSB
+# Base
 def generar_mensajes_base(ruta, id_asig):
     with open(ruta, 'r', encoding='utf8') as f:
         lineas = f.readlines()
@@ -280,6 +281,7 @@ def generar_mensajes_base(ruta, id_asig):
     return mensajes
 
 
+# Ampliadas
 def generar_mensajes_ampliado(ruta, id_asig):
     global mensajes
 
@@ -1430,6 +1432,7 @@ def generar_hilos(mensajes, campo):
                 print("sure, it was defined. (MODA_T)")
                 moda_tiempos = moda_tiempos
             # Fin excepción
+
             rango_tiempos = sorted(lista_tiempos_previos)[len(lista_tiempos_previos)-1] - sorted(lista_tiempos_previos)[0]
             print("MediaT: ", media_tiempos)
             print("MedianaT: ", mediana_tiempos)
@@ -1545,6 +1548,7 @@ def generar_hilos(mensajes, campo):
                 #    'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
                 #    'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links
             }
+
             # INICIALIZAR AUTORES #
             autores_previos = []
             # INICIALIZAR CONTADORES HILO #
@@ -1555,7 +1559,7 @@ def generar_hilos(mensajes, campo):
             # AÑADIR HILO #
             hilos.append(hilo)
 
-    print(hilos)
+    # print(hilos)
     return hilos
 
 
@@ -1609,7 +1613,7 @@ def generar_arbol_default(lista, etiqueta, campo):
     return raiz
 
 
-def generar_arbol(lista, etiqueta, campo):
+def generar_arbol(lista, etiqueta, campo, valor_raiz):
     from anytree import Node, RenderTree, AsciiStyle
 
     # NODO RAIZ #
@@ -1627,7 +1631,7 @@ def generar_arbol(lista, etiqueta, campo):
         valor = elemento.get(campo)
         valor_etiqueta = elemento.get(etiqueta)
         # Nodo NO Raíz
-        if valor != 0:
+        if valor != valor_raiz:
             # Nodos no anidados
             if valor != valor_anterior:
                 # NODOS DISTINTOS #
@@ -1675,18 +1679,177 @@ def generar_autores(mensajes, hilos, campo):
     usuarios = []
     #
 
+    # Excepción:
+    # Si la variable 'id_autor_anterior' no exite, la inicializa
+    # Si la variable 'cambia_autor' no exite, la inicializa (vale 1: si es el mismo autor, vale -1: si cambia el autor)
+    try:
+        # ID de autor
+        id_autor_anterior
+        # interruptor de cambio de hilo #
+        cambia_autor = 1
+    except NameError:
+        print("well, it WASN'T defined after all!")
+        id_autor_anterior = 0
+        cambia_autor = 1
+    else:
+        print("sure, it was defined.")
+        id_autoranterior = 0
+        cambia_autor = 1
+    # Fin excepción
+
+    # Variables Globales
+    autores_previos = []
+    foro_previo = 0
+    hilo_previo = 0
+
+    # Totales
+    n_mensajes = 0
+    n_autores = 0
+    n_hilos = 0
+    n_foros = 0
+    n_subhilos = 0
+    n_auto_respuestas = 0
+    longitud = 0  # Tamaño texto
+    distancia = 0  # Duración
+
+    # Fecha
+    fecha = ''
+
+    # Medias, moda, mediana y rango
+    # TIEMPO/DISTANCIA
+    contador_tiempo = 0
+    # PH
+    lista_tiempos_previos_ph = []
+    tiempos_previos_ph = []
+    contador_tiempos_previos_ph = []
+    max_tiempos_ph = 0
+    min_tiempos_ph = 0
+    # AS
+    lista_tiempos_previos = []
+    tiempos_previos = []
+    contador_tiempos_previos = []
+    max_tiempos = 0
+    min_tiempos = 0
+
+    # TAMAÑO/LONGITUD
+    contador_longitud = 0
+    # AS
+    lista_longitudes_previas = []
+    longitudes_previas = []
+    contador_longitudes_previas = []
+
+    n_mensajes_medio_subhilo = 0
+    longitud_media = 0.0  # Tamaño
+    distancia_media = 0.0  # Duración
+
+    # Texto
+    textos_mensajes = ''
+    titulos_mensajes = ''
+
+    # Cuantitativos
+    mensaje_mas_respondido_del_hilo = "¿CUÁL SERÁ?"
+    autor_mas_respondedor_del_hilo = "¿CUÁL SERÁ?"
+
     # Orena por Autores
     lista_mensajes = sorted(mensajes, key=lambda objeto: objeto['Remitente'])
 
-    #Ordena por Autores y Fecha
-    lista_mensajes2 = sorted(lista_mensajes, key=lambda o: (o['Remitente'], o['Distancia OO']))
+    ############################
+    # Ordena por Autores y Fecha (para crear la lista de autores por mensaje escrito)
+    ############################
+    lista_mensajes_fecha = sorted(lista_mensajes, key=lambda o: (o['Remitente'], o['Distancia OO']))
+
+    # PARA CADA MENSAJE #
+    for index, mensaje in enumerate(lista_mensajes_fecha):
+
+        # Date
+        fecha = mensaje['Fecha'] + ' ' + mensaje['Hora']
+
+        ########################
+        # Derfinición de AUTOR
+        ########################
+        # autor = [tit_hilo, id_hilo, dia_semana, fecha, n_mensajes, n_autores, n_subhilos, n_auto_respuestas, longitud, distancia, longitud_media, distancia_media]
+        autor = {
+            # BASE #
+            # MENSAJES #
+            'Asignatura': mensaje['Asignatura'],
+            'Foro': mensaje['Foro'], 'Nombre foro': mensaje['Nombre foro'],
+            'Caracteres foro': mensaje['Caracteres foro'],
+            'Hilo': mensaje['Hilo'], 'Título': mensaje['Título'], 'Caracteres hilo': mensaje['Caracteres hilo'],
+            #'Nº autores': n_autores,
+            #'Nº foro': n_foros,
+            #'Nº hilo': n_hilos,
+            #'Nº mensajes': n_mensajes,
+            #'Nº auto-respuestas': n_auto_respuestas,
+            #'Nº subhilos': n_subhilos,
+            # MENSAJES x SUBHILO
+            #'Mensajes medios por subhilo': n_mensajes_medio_subhilo,
+                'Mensaje': mensaje['Mensaje'], 'Responde a': mensaje['Responde a'],
+                'Remitente': mensaje['Remitente'], 'Autor': mensaje['Autor'],
+            # TIPO INICIAL, TERMINAL, RESPUESTA Y AUTO-RESPUESTA
+            #    'Inicial': inicial, 'Respuesta': respuesta, 'Auto-respuesta': auto_respuesta, 'Terminal': terminal,
+            # DISTANCIAS Padre-Hijo Antecesor-Sucesor
+            #    'Día': dia_semana, 'Fecha': fecha, 'Hora': hora,
+            'Date': fecha,
+            # DISTANCIA y DISTANCIA MEDIA #
+            #'Distancia': distancia,
+            #'Distancia / Mensajes': distancia_media,
+            #    'Distancia PH': date_ph
+            #'Distancia Max': max_tiempos_ph,
+            #'Distancia Min': min_tiempos_ph,
+            #'MediaTph': media_tiempos_ph,
+            #'MedianaTph': mediana_tiempos_ph,
+            #'ModaTph': moda_tiempos_ph,
+            #'RangoTph': rango_tiempos_ph,
+            #    'Distancia AS': date_as,
+            #'MediaTas': media_tiempos,
+            #'MedianaTas': mediana_tiempos,
+            #'ModaTas': moda_tiempos,
+            #'RangoTas': rango_tiempos,
+            # DIFERENCIAS TAMAÑO Padre-Hijo Antecesor-Sucesor
+            #'Longitud': longitud,
+            #'Longitud media': longitud_media,
+            #'Longitud Max': max_tiempos,
+            #'Longitud Min': min_tiempos,
+            #'MediaL': media_longitudes,
+            #'MedianaL': mediana_longitudes,
+            #'ModaL': moda_longitudes,
+            #'RangoL': rango_longitudes,
+            #'Títulos mensajes': titulos_mensajes, 'Caracteres títulos mensajes': len(titulos_mensajes),
+            #'Textos mensajes': textos_mensajes.strip(), 'Caracteres textos mensajes': len(textos_mensajes),
+            # ANÁLISIS de TEXTO
+            # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
+            #    'Tokens': var_token,
+            # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras}
+            #    "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'),
+            #    'ns': var_token.get('ns'),
+            # .SnowballStemmer("spanish").stem,
+            #    'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas}
+            #    'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
+            # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
+            #    'Postag': var_pos,
+            # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
+            #    'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
+            #    'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links
+        }
+
+        # INICIALIZAR AUTORES #
+        autores_previos = []
+        # INICIALIZAR CONTADORES AUTOR #
+        longitud = 0
+        n_mensajes = 0
+        distancia = 0
+
+        # AÑADIR AUTOR #
+        usuarios.append(autor)
+
+    return usuarios
 
     #import operator
-    #lista_mensajes2 = sorted(lista_mensajes, key=operator.itemgetter('Remitente', 'Fecha'))
+    #lista_mensajes_fecha = sorted(lista_mensajes, key=operator.itemgetter('Remitente', 'Fecha'))
 
-    #lista_mensajes2 = sorted(lista_mensajes, key=lambda objeto: (objeto['Remitente'], objeto['Fecha']))
+    #lista_mensajes_fecha = sorted(lista_mensajes, key=lambda objeto: (objeto['Remitente'], objeto['Fecha']))
 
-    #lista_mensajes2 = sorted([(e['Remitente'], e['Date'], e) for e in mensajes], reverse=True)
+    #lista_mensajes_fecha = sorted([(e['Remitente'], e['Date'], e) for e in mensajes], reverse=True)
 
     # sort edges: primary key=length, secondary key=start index.
     # (and filter out the token edges)
@@ -1699,7 +1862,7 @@ def generar_autores(mensajes, hilos, campo):
     print('------------------')
 
     for i in range(0, 20, 1):
-        print(lista_mensajes2[i]['Remitente'], lista_mensajes2[i]['Date'], lista_mensajes2[i])
+        print(lista_mensajes_fecha[i]['Remitente'], lista_mensajes_fecha[i]['Date'], lista_mensajes_fecha[i])
 
     from anytree import Node, RenderTree
 
