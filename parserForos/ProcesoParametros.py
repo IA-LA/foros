@@ -13,7 +13,7 @@ Opciones de ejecución del script en base a los parámetros de la línea de coma
         # FICHERO         sys.argv[1]:    "D:\ruta\nombre____ABRV____ID____AÑO.txt"
             - ABRV : nombre corto de la asignatura
             - ID   : identificador UNED de la asignatura
-            - AÑO  : curso (2017, 2018, 1029, ...)
+            - ANO  : curso (2017, 2018, 1029, ...)
 
     - 1 parámetro: (se ejecuta sobre todos los ficheros del directorio con el formato "nombre____ABRV____ID____AÑO.txt")
         # DIRECTORIO      sys.argv[1]:    "D:\ruta\"
@@ -53,7 +53,7 @@ def filtrar_parametros(parametros):
 
         return [{'tipo': n, 'rutaynombre': rutaynombre,
                  'rutaynombreyextensionTxt': rutaynombreyextensionTxt,
-                 'id_asignatura': id_asignatura, 'abreviatura': None, 'año': None}]
+                 'id_asignatura': id_asignatura, 'abreviatura': None, 'ano': None}]
 
     # 1 parámetro
     elif n == 2:
@@ -80,7 +80,7 @@ def filtrar_parametros(parametros):
             print(nombre, abrv, id_asig, curso)
             ficheros.append({'tipo': n, 'rutaynombre': rutaynombre,
                              'rutaynombreyextensionTxt': rutaynombreyextensionTxt,
-                             'id_asignatura': id_asig, 'abreviatura': abrv, 'año': curso})
+                             'id_asignatura': id_asig, 'abreviatura': abrv, 'ano': curso})
 
         # FICHERO       : D:\ruta\
         else:
@@ -125,7 +125,7 @@ def filtrar_parametros(parametros):
 
                     ficheros.append({'tipo': n, 'rutaynombre': rutaynombre,
                                      'rutaynombreyextensionTxt': rutaynombreyextensionTxt,
-                                     'id_asignatura': id_asig, 'abreviatura': abrv, 'año': curso})
+                                     'id_asignatura': id_asig, 'abreviatura': abrv, 'ano': curso})
 
             print(ficheros)
 

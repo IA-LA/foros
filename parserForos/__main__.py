@@ -36,10 +36,10 @@ if __name__ == '__main__':
         # # 1. MENSAJES # #
         print('Generando 1', rutaynombreUtf8, fichero.id_asignatura)
         # lista_de_mensajes = generar_mensajes_base(rutaynombreUtf8, id_asignatura)
-        lista_de_mensajes = generar_mensajes_ampliado(rutaynombreUtf8, fichero.id_asignatura)
-        lista_de_hilos = generar_hilos(lista_de_mensajes, 'Hilo')
-        lista_de_autores = generar_autores(lista_de_mensajes, lista_de_hilos, 'Remitente')
-        #lista_de_asignaturas = generar_asignaturas(lista_de_mensajes, lista_de_hilos, lista_de_autores, 'Asignaturas')
+        lista_de_mensajes = generar_mensajes_ampliado(rutaynombreUtf8, fichero.id_asignatura, fichero.ano)  # FALTA el AÑO y HASH(date)
+        lista_de_hilos = generar_hilos(lista_de_mensajes, 'Hilo', fichero.ano)
+        lista_de_autores = generar_autores(lista_de_mensajes, lista_de_hilos, 'Remitente', fichero.ano)
+        #lista_de_asignaturas = generar_asignaturas(lista_de_mensajes, lista_de_hilos, lista_de_autores, 'Asignaturas', fichero.ano)
 
         # # PARTICIONES # #
         # info = partir_x_campo(lista_de_mensajes, 'Mensaje')
