@@ -14,6 +14,13 @@ import re
 
 if __name__ == '__main__':
 
+    ###########
+    # PRUEBAS #
+    ###########
+    #print(sys.float_info)
+    #print(sys.maxsize)
+    #exit(999)
+
     ficheros = filtrar_parametros(sys.argv)
 
     # PARA CADA FICHERO #
@@ -34,12 +41,48 @@ if __name__ == '__main__':
         # # PRE PROCESADO INICIO # #
 
         # # 1. MENSAJES # #
-        print('Generando 1', rutaynombreUtf8, fichero.id_asignatura)
+        print('Generando 1.JSON')
+        #print('Generando 1.JSON', rutaynombreUtf8, fichero.id_asignatura)
         # lista_de_mensajes = generar_mensajes_base(rutaynombreUtf8, id_asignatura)
-        lista_de_mensajes = generar_mensajes_ampliado(rutaynombreUtf8, fichero.id_asignatura, fichero.ano)  # FALTA el AÑO y HASH(date)
-        lista_de_hilos = generar_hilos(lista_de_mensajes, 'Hilo', fichero.ano)
-        lista_de_autores = generar_autores(lista_de_mensajes, lista_de_hilos, 'Remitente', fichero.ano)
-        #lista_de_asignaturas = generar_asignaturas(lista_de_mensajes, lista_de_hilos, lista_de_autores, 'Asignaturas', fichero.ano)
+        lista_de_mensajes = generar_mensajes_ampliado(rutaynombreUtf8, fichero.id_asignatura, fichero.ano, '')
+        lista_de_hilos = generar_hilos(lista_de_mensajes, 'Hilo', fichero.ano, '')
+        lista_de_autores = generar_autores(lista_de_mensajes, lista_de_hilos, 'Remitente', fichero.ano, '')
+        #lista_de_foros = generar_asignaturas(lista_de_mensajes, lista_de_hilos, lista_de_autores, 'Foro', fichero.ano, '')
+        #lista_de_asignaturas = generar_asignaturas(lista_de_mensajes, lista_de_hilos, lista_de_autores, lista_de_foros 'Asignaturas', fichero.ano, '')
+
+        # # .CSV WEKA (Sin Títulos ni Textos) # #
+        lista_de_mensajes_cluster = generar_mensajes_ampliado(rutaynombreUtf8, fichero.id_asignatura, fichero.ano, 'cluster')
+        lista_de_hilos_cluster = generar_hilos(lista_de_mensajes, 'Hilo', int(fichero.ano), 'cluster')
+        lista_de_autores_cluster = generar_autores(lista_de_mensajes, lista_de_hilos, 'Remitente', int(fichero.ano), 'cluster')
+
+        ###################
+        # ANÁLISIS de TEXTO
+        ###################
+        from procesadoGeneral import tokenizado
+        from procesadoGeneral import enraizado
+        from procesadoGeneral import postag
+        from procesadoGeneral import cluster
+
+        #var_token = tokenizado(texto.strip())
+        #print('TOKENIZADO(', n_mensajes_hilo, '): ', var_token)
+
+        #var_raiz = enraizado()
+        #print('RAICES: ', var_raiz)
+
+        #var_pos = postag(texto.strip())
+        #print('POSTAG: ', var_pos)
+
+        #exit(999)
+
+
+        ###################
+        # CLÚSTER de TEXTO
+        ###################
+
+        #var_clu = cluster(lista_de_autores_cluster)
+        #print('CLUSTER: ', var_clu)
+
+        #exit(999)
 
         # # PARTICIONES # #
         # info = partir_x_campo(lista_de_mensajes, 'Mensaje')
@@ -55,30 +98,37 @@ if __name__ == '__main__':
 
         # # ARBOLES # #
         # generar_arbol_default(info[0], 'Mensaje',  'Respuesta')
-        generar_arbol_default(info[0], 'Mensaje', 'Responde a')
+        #generar_arbol_default(info[0], 'Mensaje', 'Responde a')
         # generar_arbol(info[0], 'Mensaje', 'Responde a', 0)
-        generar_arbol(info[0], 'Mensaje', 'Respuesta', 0)
+        #generar_arbol(info[0], 'Mensaje', 'Respuesta', 0)
         ########################
-        # exit(0)
+        #exit(0)
         ########################
 
 
         # # 2. LIMPIEZA de Mensajes ([IMAGE: ] y FOROS Profesor-Tutor # #
-        print('\nGenerando 1 Mensaje', re.compile('\(.*\)\,').split(lista_de_mensajes[0]['Texto mensaje']))
+        #print('\nGenerando 1 Mensaje', re.compile('\(.*\)\,').split(lista_de_mensajes[0]['Texto mensaje']))
         ## limpiarImagenMensaje('[IMAGE:.')
 
         # # PRE PROCESADO FIN # #
 
         # # .CSV # #
-        print('\nGenerando 1 .CSV', fichero.rutaynombre, lista_de_mensajes[0])
+        print('\nGenerando 1 .CSV')
+        #print('\nGenerando 1 .CSV', fichero.rutaynombre, lista_de_mensajes[0])
         #rutaynombreyextensionCsv = generar_csv(rutaynombre, lista_de_mensajes)
         rutaynombreyextensionCsv_mensajes = generar_csv(fichero.rutaynombre + '_mensajes', lista_de_mensajes)
         rutaynombreyextensionCsv_hilos = generar_csv(fichero.rutaynombre + '_hilos', lista_de_hilos)
         rutaynombreyextensionCsv_autores = generar_csv(fichero.rutaynombre + '_autores', lista_de_autores)
         #rutaynombreyextensionCsv_asignaturas = generar_csv(fichero.rutaynombre + '_asignaturas', lista_de_asignaturas)
 
+        # # .CSV WEKA (Sin Títulos ni Textos) # #
+        rutaynombreyextensionCsv_mensajes_cluster = generar_csv(fichero.rutaynombre + '_mensajes_cluster', lista_de_mensajes_cluster)
+        rutaynombreyextensionCsv_hilos_cluster = generar_csv(fichero.rutaynombre + '_hilos_cluster', lista_de_hilos_cluster)
+        rutaynombreyextensionCsv_autores_cluster = generar_csv(fichero.rutaynombre + '_autores_cluster', lista_de_autores_cluster)
+
         # # Pandas DATA FRAME # #
-        print('\nGenerando 1 Pandas DATA FRAME del .CSV', rutaynombreyextensionCsv_mensajes)
+        print('\nGenerando 1 Pandas DATA FRAME del .CSV')
+        #print('\nGenerando 1 Pandas DATA FRAME del .CSV', rutaynombreyextensionCsv_mensajes)
         # pandas_df = generar_df(rutaynombreyextensionCsv)
         pandas_df_mensajes = generar_df(rutaynombreyextensionCsv_mensajes)
         pandas_df_hilos = generar_df(rutaynombreyextensionCsv_hilos)
@@ -86,7 +136,8 @@ if __name__ == '__main__':
         # pandas_df_asignaturas = generar_df(rutaynombreyextensionCsv_asignaturas)
 
         # # .XSLX # #
-        print('\nGenerando 1 .XLSX', pandas_df_mensajes, fichero.rutaynombre)
+        print('\nGenerando 1 .XLSX')
+        #print('\nGenerando 1 .XLSX', pandas_df_mensajes, pandas_df_hilos, pandas_df_autores, fichero.rutaynombre)
         # Escribe hoja GENERAL
         # escribir_excel(pandas_df, rutaynombre, 'General')
         # Escribe hoja de características GENERAL
