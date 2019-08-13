@@ -829,10 +829,12 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo):
                     # ANÁLISIS del TEXTO
                     #
                     var_token = tokenizado(texto.strip())
-                    print('TOKENIZADO(', n_mensajes_hilo, '): ', var_token)
+                    print('TOKENIZADO')
+                    #print('TOKENIZADO(', n_mensajes_hilo, '): ', var_token)
 
                     var_raiz = enraizado()
-                    print('RAICES(', var_token, '): ', var_raiz)
+                    print('RAICES')
+                    #print('RAICES(', var_token, '): ', var_raiz)
 
                     #var_pos = postag(texto.strip())
                     #print('POSTAG(', var_raiz, '): ', var_pos)
@@ -936,8 +938,7 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo):
                             'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
                             # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
                             #'Postag': var_pos,  # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
-                            #'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'),
-                            'nvd': var_pos.get('nvd'),
+                            #'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
                             'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links,
                             'Curso': int(curso),
                         }
@@ -1391,10 +1392,12 @@ def generar_hilos(mensajes, campo, curso_asig, tipo):
             # ANÁLISIS de los TEXTOS de un HILO
             #
             var_token = tokenizado(textos_mensajes.strip())
-            print('TOKENIZADO(', n_mensajes, '): ', var_token)
+            #print('TOKENIZADO(', n_mensajes, '): ', var_token)
+            print('TOKENIZADO')
 
             var_raiz = enraizado()
-            print('RAICES: ', var_raiz)
+            #print('RAICES: ', var_raiz)
+            print('RAICES')
 
             #var_pos = postag(textos_mensajes.strip())
             #print('POSTAG: ', var_pos)
@@ -1876,10 +1879,12 @@ def generar_autores(mensajes, hilos, campo, curso_asig, tipo):
             # ANÁLISIS de los TEXTOS de un HILO
             #
             var_token = tokenizado(textos_mensajes.strip())
-            print('TOKENIZADO(', n_mensajes, '): ', var_token)
+            #print('TOKENIZADO(', n_mensajes, '): ', var_token)
+            print('TOKENIZADO')
 
             var_raiz = enraizado()
-            print('RAICES: ', var_raiz)
+            #print('RAICES: ', var_raiz)
+            print('RAICES')
 
             #var_pos = postag(textos_mensajes.strip())
             #print('POSTAG: ', var_pos)
