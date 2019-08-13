@@ -20,6 +20,7 @@ import procesadoMensaje
 data = "All work and no play makes jack dull boy. All work and no play makes jack a dull boy."
 mensaje = " Me cago en en tu puta madre 0.Mierda para tu puta madre 1. Mierda para tu puta madre "
 "2.Mierda para tu puta madre 3. Mierda para tu puta madre 4.Caca de la vaca, para el resto. 5. Final"
+instancias = []
 
 tokens = []
 sentencias = []
@@ -230,8 +231,8 @@ def tokenizado(msj=mensaje):
     longitud_media_tokens = longitud_media_tokens + numero_tokens
     longitud_media_frases = longitud_media_frases + numero_frases
 
-    print('FRASES', sentencias)
-    print('TOKENS', lista_tokens)
+    #print('FRASES', sentencias)
+    #print('TOKENS', lista_tokens)
 
     # STOPWRODS
     print('STOPWRODS lang="es"')
@@ -267,10 +268,10 @@ def tokenizado(msj=mensaje):
     numero_palabras = len(lista_palabras)
     numero_stop_words = numero_tokens - numero_palabras
 
-    print('STOPWORDS', stop_words)
-    print('PALABRAS', lista_palabras)
+    #print('STOPWORDS', stop_words)
+    #print('PALABRAS', lista_palabras)
 
-    return {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras, 'ns': numero_stop_words}
+    return {"c": msj, "lc": longitud_caracteres, 't': lista_tokens, 'nt': numero_tokens, 'f': sentencias, 'nf': numero_frases, 'p': lista_palabras, 'np': numero_palabras, 'ns': numero_stop_words}
 
 
 # RAIZ
@@ -298,9 +299,9 @@ def enraizado(pal=lista_palabras):
     numero_raices_distintas = len(lista_raices_distintas)
 
     # print('IDIOMAS', SnowballStemmer.languages)
-    print('RAICES', lista_raices, lista_raices_distintas)
+    #print('RAICES', lista_raices, lista_raices_distintas)
 
-    return {'nr': numero_raices, 'nrd': numero_raices_distintas}
+    return {'r': lista_raices, 'nr': numero_raices, 'rd': lista_raices_distintas, 'nrd': numero_raices_distintas}
 
 
 # POSTAGGING
@@ -391,14 +392,115 @@ def postag(msj=mensaje):
     print('NOMBRES', nombres, nombres_distintos)
     print('VERBOS', verbos, verbos_distintos)
 
-    return {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
+    return {'n': nombres, 'nn': numero_nombres, 'v': verbos, 'nv': numero_verbos, 'nd': nombres_distintos, 'nnd': numero_nombres_distintos, 'vd': verbos_distintos, 'nvd': numero_verbos_distintos}
 
 
+###########################
+# CLASIFICACIONES Y CULSTER
+###########################
+# CULSTER
 ########################
-# CLASIFICACIONES Y CULSTERIZACIONES
+def cluster(ins=instancias):
+    from nltk.cluster import em
+    from nltk.cluster import gaac
+    from nltk.cluster import kmeans
+    from nltk.cluster import util
+
+    print('#######')
+    print('CLUSTER')
+    print('#######')
+
+    em.demo()
+    gaac.demo()
+    kmeans.demo()
+
+    try:
+        import numpy as np
+    except ImportError:
+        pass
+
+    print(util.cosine_distance(np.array([0.5, 0.5, 0.5]), np.array([1, 1, 1])))
+    print(util.euclidean_distance(np.array([0.1, 0.1, 0.1]), np.array([1, 1, 1])))
+
+    class AttributeDict(dict):
+        __getattr__ = dict.__getitem__
+        __setattr__ = dict.__setitem__
+
+    #ins = AttributeDict(ins)
+    for item in enumerate(ins):
+        print()
+        #print(item)
+        #print(getattr(item, 'Nº autores'))
+
+    # Recorre dict ins=intancias
+    #colocando sólo valores en el vector
+    vector = []
+    vectores = []
+    for i, item in enumerate(ins):
+        vector = [v for v in item.values()]
+        vectores.append(vector)
+        #for key, value in item.items():
+        #    print(key, value)
+        #print(getattr(item, 'Nº autores'))
+
+    print(vectores[0])
+
+    # Pribando las distancias
+    util.euclidean_distance(np.array(vectores[1]), np.array(vectores[0]))
+
+    #vectors = [np.array(f) for f in ins]
+    #vectors = [np.array(f.items()) for f in ins]
+    #vectors = [np.array(f.keys()) for f in ins]
+    #vectors = [np.array(f.values()) for f in ins]
+
+    vectors = [np.array(f) for f in vectores]
+
+    print()
+    print(vectors[0])
+    #exit(1)
+
+    # test k-means using the euclidean distance metric, 2 means and repeat
+    # clustering 10 times with random seeds
+    clusterer = kmeans.KMeansClusterer(4, util.euclidean_distance, repeats=10)
+    clusters = clusterer.cluster(vectors, True)
+    print('Clustered:', vectors)
+    print('As:', clusters)
+    print('Means:', clusterer.means())
+    print()
+
+    # test the GAAC clusterer with 4 clusters
+    clusterer = gaac.GAAClusterer(4)
+    clusters = clusterer.cluster(vectors, True)
+
+    print('Clusterer:', clusterer)
+    print('Clustered:', vectors)
+    print('As:', clusters)
+    print()
+
+    return 0
+
+    # test the EM clusterer
+    #mediasID = [[0, 1, 1, 1, 96170, 96170, 0, 1, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0.0, 0.0, 0.0, 0.0, 218, 0.0, 0, 0, 11, 215, 2019], [0, 1, 1, 1, 96170, 96170, 0, 1, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0.0, 0.0, 0.0, 0.0, 218, 0.0, 0, 0, 11, 215, 2019], [0, 1, 1, 1, 96170, 96170, 0, 1, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0.0, 0.0, 0.0, 0.0, 218, 0.0, 0, 0, 11, 215, 2019], [0, 1, 1, 1, 96170, 96170, 0, 1, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0.0, 0.0, 0.0, 0.0, 218, 0.0, 0, 0, 11, 215, 2019]]
+    #mediasID = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0, 0, 0, 0, 0],
+    #          [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1.0, 1.0, 1, 1, 1, 1, 1.0, 1.0, 1.0, 1.0, 1, 1, 1.0, 1.0, 1.0, 1.0, 1, 1.0, 1, 1, 1, 1, 1],
+    #          [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2.0, 2.0, 2, 2, 2, 2, 2.0, 2.0, 2.0, 2.0, 2, 2, 2.0, 2.0, 2.0, 2.0, 2, 2.0, 2, 2, 2, 2, 2],
+    #          [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3.0, 3.0, 3, 3, 3, 3, 3.0, 3.0, 3.0, 3.0, 3, 3, 3.0, 3.0, 3.0, 3.0, 3, 3.0, 3, 3, 3, 3, 3]]
+    #medias = [[0, 1, 1, 1, 0, 1, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0.0, 0.0, 0.0, 0.0, 218, 0.0, 0, 0, 11, 215, 2019], [0, 1, 1, 1, 0, 1, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0.0, 0.0, 0.0, 0.0, 218, 0.0, 0, 0, 11, 215, 2019], [0, 1, 1, 1, 0, 1, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0.0, 0.0, 0.0, 0.0, 218, 0.0, 0, 0, 11, 215, 2019], [0, 1, 1, 1, 0, 1, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0.0, 0.0, 0.0, 0.0, 218, 0.0, 0, 0, 11, 215, 2019]]
+    medias = [[0, 0, 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0, 0, 0, 0, 0],
+              [1, 1, 1, 1, 1, 1, 1, 1, 1.0, 1.0, 1, 1, 1, 1, 1.0, 1.0, 1.0, 1.0, 1, 1, 1.0, 1.0, 1.0, 1.0, 1, 1.0, 1, 1, 1, 1, 1],
+              [2, 2, 2, 2, 2, 2, 2, 2, 2.0, 2.0, 2, 2, 2, 2, 2.0, 2.0, 2.0, 2.0, 2, 2, 2.0, 2.0, 2.0, 2.0, 2, 2.0, 2, 2, 2, 2, 2],
+              [3, 3, 3, 3, 3, 3, 3, 3, 3.0, 3.0, 3, 3, 3, 3, 3.0, 3.0, 3.0, 3.0, 3, 3, 3.0, 3.0, 3.0, 3.0, 3, 3.0, 3, 3, 3, 3, 3]]
+    clusterer = em.EMClusterer(medias, bias=0.1)
+    clusters = clusterer.cluster(vectors, True, trace=True)
+
+    print('Clustered:', vectors)
+    print('As:       ', clusters)
+    print()
+
+    return 0
+
+# CLASIFICACIONES
 ########################
-
-
 # GENERO
 ########################
 def genero():

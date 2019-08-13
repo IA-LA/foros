@@ -45,3 +45,13 @@
 | nombre        | título        | id        | texto     | id        |
 | nombre        | título        | id        | texto     | id        |
 | nombre        | título        | id        | texto     | id        |
+
+## MODULOS (GESTION DE)
+### Listar módulos
+* C:\> 
+* C:\> pip list
+* C:\> pip freeze
+### Exportar módulos a fichero
+* C:\> pip freeze > requirements.txt
+### Immportar módulos de fichero
+* C:\> pip install -r requirements.txt
