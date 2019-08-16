@@ -28,11 +28,23 @@ def filtrar_parametros(parametros):
 
     ficheros = []
     id_asignatura = ''
+    ruta = ''
     rutaynombre = ''
     rutaynombreyextensionTxt = ''
 
     # N.º de parámetros
     n = len(parametros)
+
+    # Ruta de origen
+    # Quita Barra final del directorio
+    #   (si existe \" en el parámetro ruta)
+    #   (si no existe no hace mucho)
+    ruta = os.path.normpath(parametros[1].split('"')[0])
+    # Si es una ruta con fichero.TXT
+    if '.txt' in ruta.split(os.sep)[len(ruta.split(os.sep)) - 1]:
+        ruta = ruta.split(ruta.split(os.sep)[len(ruta.split(os.sep)) - 1])[0]
+    else:
+        ruta = ruta + os.sep
 
     # 2 parámetros
     if n == 3:
@@ -51,7 +63,7 @@ def filtrar_parametros(parametros):
         # Argumento 2: ID asignatura
         id_asignatura = parametros[2]
 
-        return [{'tipo': n, 'rutaynombre': rutaynombre,
+        return [{'tipo': n, 'ruta': ruta, 'rutaynombre': rutaynombre,
                  'rutaynombreyextensionTxt': rutaynombreyextensionTxt,
                  'id_asignatura': id_asignatura, 'abreviatura': None, 'ano': None}]
 
@@ -77,8 +89,8 @@ def filtrar_parametros(parametros):
             id_asig = nombre[2]
             curso = nombre[3]
 
-            print(nombre, abrv, id_asig, curso)
-            ficheros.append({'tipo': n, 'rutaynombre': rutaynombre,
+            #print(nombre, abrv, id_asig, curso)
+            ficheros.append({'tipo': n, 'ruta': ruta, 'rutaynombre': rutaynombre,
                              'rutaynombreyextensionTxt': rutaynombreyextensionTxt,
                              'id_asignatura': id_asig, 'abreviatura': abrv, 'ano': curso})
 
@@ -87,7 +99,9 @@ def filtrar_parametros(parametros):
             from os import walk
             from os.path import isfile, join
 
-            # Quita Barra final del directorio (si existe \" en el parámetro ruta)
+            # Quita Barra final del directorio
+            #   (si existe \" en el parámetro ruta)
+            #   (si no existe no hace mucho)
             if not os.path.exists(parametros[1]):
                 parametros[1] = parametros[1].split('"')[0]
 
@@ -97,7 +111,7 @@ def filtrar_parametros(parametros):
                 lista_ficheros.extend(filenames)
                 break
 
-            print(lista_ficheros)
+            #print(lista_ficheros)
 
             # PARA CADA FICHERO #
             for index, fichero in enumerate(lista_ficheros):
@@ -123,7 +137,7 @@ def filtrar_parametros(parametros):
                     id_asig = nombre[2]
                     curso = nombre[3]
 
-                    ficheros.append({'tipo': n, 'rutaynombre': rutaynombre,
+                    ficheros.append({'tipo': n, 'ruta': ruta, 'rutaynombre': rutaynombre,
                                      'rutaynombreyextensionTxt': rutaynombreyextensionTxt,
                                      'id_asignatura': id_asig, 'abreviatura': abrv, 'ano': curso})
 

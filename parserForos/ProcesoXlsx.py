@@ -4,6 +4,10 @@ Created on 09-01-2019
 @author: Aitor Diaz Medina
 
 Generación de vistas temporales del csv importado
+
+@author: FJSB
+
+Anonimizado de vistas temporales del csv importado
 """
 
 
@@ -19,8 +23,15 @@ pd.set_option("display.max_columns", 10)
 
 def generar_df(input_file):
     df = pd.read_csv(input_file)
-    # Anonimizado
+
+    # # Anonimizado (generar_df)
+    # ESTOS CAMPOS SE DEBEN MANTENER PARA LA CORRECTA EXPORTACION A EXCEL
+    # Hilo
+    df['Título'] = '(Borrado)'
+    # Textos
+    df['Título mensaje'] = '(Borrado)'
     df['Texto mensaje'] = '(Borrado)'
+
     # Campo temporal
     df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y %H:%M:%S')
 
@@ -36,9 +47,20 @@ def escribir_excel(df, nombre_archivo, nombre_hoja):
     print(nombre_archivo, nombre_hoja)
     excel = nombre_archivo + ".xlsx"
     if not os.path.isfile(excel):
+        # # Anonimizado (escribir_excel)
+        # Autor anónimo
+        # autor(Nombre1 Nombre 2 Apellido1 Apellido 2) == id_autor(HASH())
+        df['Autor'] = df['Remitente']
+        #print(df['Autor'])
+        #print(df['Remitente'])
         with pd.ExcelWriter(excel, datetime_format='dd/mm/yyyy', date_format='dd/mm/yyyy', time_format='hh:mm:ss') as writer:
             df.to_excel(writer, sheet_name=nombre_hoja, engine='xlsxwriter')
     else:
+        # # Autor anónimo
+        # autor (Nombre1 Nombre 2 Apellido1 Apellido 2) == id_autor (HASH())
+        df['Autor'] = df['Remitente']
+        #print(df['Autor'])
+        #print(df['Remitente'])
         with pd.ExcelWriter(excel, datetime_format='DD/MM/YYYY', date_format='DD/MM/YYYY', time_format='HH:MM:SS', mode='a') as writer:
             df.to_excel(writer, sheet_name=nombre_hoja, engine='xlsxwriter')
     print('Fichero Excel creado: ', excel)

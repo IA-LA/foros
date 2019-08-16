@@ -19,25 +19,57 @@ asignaturas = []
 foros = []
 
 dia_semana_nombre = {
+    'L': 1,
+    'l': 1,
+    'Lun': 1,
+    'lun': 1,
     'Lunes': 1,
     'lunes': 1,
+    'M': 2,
+    'm': 2,
+    'Mar': 2,
+    'mar': 2,
     'Martes': 2,
     'martes': 2,
+    'Mx': 3,
+    'mx': 3,
+    'Mie': 3,
+    'mie': 3,
     'Miércoles': 3,
     'miércoles': 3,
     'Miercoles': 3,
     'miercoles': 3,
+    'J': 4,
+    'j': 4,
+    'Jv': 4,
+    'jv': 4,
+    'Jue': 4,
+    'jue': 4,
     'Jueves': 4,
-    'Jueves': 4,
+    'jueves': 4,
+    'V': 5,
+    'v': 5,
+    'Vie': 5,
+    'vie': 5,
     'Viernes': 5,
-    'Viernes': 5,
+    'viernes': 5,
+    'S': 6,
+    's': 6,
+    'Sab': 6,
+    'sab': 6,
     'Sábado': 6,
     'sábado': 6,
     'Sabado': 6,
-    'Sabado': 6,
+    'sabado': 6,
+    'D': 7,
+    'd': 7,
+    'Dom': 7,
+    'dom': 7,
     'Domingo': 7,
-    'Domingo': 7,
+    'domingo': 7,
 }
+
+
 def month_string_to_number(string):
     m = {
         'ene': 1,
@@ -84,7 +116,7 @@ def partir_x_campo(lista, campo):
     jndex = 0
     for index, li in enumerate(lista):
         val = li.get(campo)
-        # print(val)
+        print(val)
         if val != campo_anterior:  # NUEVA INSTANCIA x CAMPO: Hilo, Remitente o Autor,
 
             campo_anterior = val
@@ -92,7 +124,7 @@ def partir_x_campo(lista, campo):
             destino.insert(jndex, lista_destino)
             jndex = jndex + 1
 
-            # print('PARTE POR UN NUEVO CAMPO', index, jndex, val)
+            print('PARTE POR UN NUEVO CAMPO', index, jndex, val)
             lista_destino = []
             lista_destino.append(li)
         else:
@@ -126,8 +158,8 @@ def repartir_x_campo(lista, campo):
 
         destino2d['jo'] = 1
 
-
     print(destino2d)
+
     return destino2d
 
 
@@ -489,7 +521,7 @@ def generar_mensajes_base(ruta, id_asig):
     return mensajes
 
 
-# Ampliadas
+# Ampliados
 def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo):
     global mensajes
 
@@ -555,11 +587,12 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo):
         for index, linea in enumerate(lineas):
 
             if linea.startswith('Foro: '):
-                print(linea.partition('Foro: ')[2])
+                #print(linea.partition('Foro: ')[2])
                 nombre_foro = linea.partition('Foro: ')[2]
                 ## Foro
                 ## ID = HASH('Título Foro' + 'Date')
                 # Hash(FORO)
+                # con Fecha añadida para hacerlo único
                 id_foro = int(hashlib.sha1(nombre_foro.encode('utf-8') + str(datetime.now()).encode('utf-8')).hexdigest(), 16) % (10 ** 8)
 
             elif linea.startswith('Mensajes de la conversación: '):
@@ -567,6 +600,7 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo):
                 ## Hilo
                 ## ID = HASH('Título del 1er Mensaje del  Hilo' + 'Date')
                 # Hash(HILO)
+                # con Fecha añadida para hacerlo único
                 id_hilo = int(hashlib.sha1(tit_hilo.encode('utf-8') + str(datetime.now()).encode('utf-8')).hexdigest(), 16) % (10 ** 8)
 
             elif linea.startswith('Mensaje no. '):
@@ -587,9 +621,9 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo):
                 ## Autor
                 ## ID = HASH('Nombres Apellidos' + 'Date')
                 # Hash(AUTOR)
-                id_autor = int(hashlib.sha1(autor.encode('utf-8') + str(datetime.now()).encode('utf-8')).hexdigest(), 16) % (10 ** 8)
+                id_autor = int(hashlib.sha1(autor.encode('utf-8')).hexdigest(), 16) % (10 ** 8)
                 ## Autor anónimo
-                autor = id_autor
+                #autor = id_autor
 
                 fecha = linea.partition(" el ")[2].strip()
                 if not lineas[index + 1].startswith('Título: '):
@@ -654,7 +688,8 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo):
                     # Cuenta EMOJI: las [IMAGE: '.+' ...]
                     n_emojis = len(re.findall(r'(\[IMAGE: \'.+\'.*\])', texto, re.M | re.I))
                     if n_emojis > 0:
-                        print('EMOJIS:', n_emojis)
+                        print()
+                        #print('EMOJIS:', n_emojis)
 
                     # Cuenta LINKS
                     n_links = 0
@@ -662,7 +697,7 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo):
 
                     # Busca ADJUNTOS Y EMOJIS
                     if texto.find('[IMAGE:') != -1:
-                        print('ADJUNTOS ENCONTRADOS: ', n_adjs)
+                        #print('ADJUNTOS ENCONTRADOS: ', n_adjs)
                         # Busca [IMAGE:
                         regex = re.search(r'(\[IMAGE: .*\])', texto, re.M | re.I)
                         if regex != None:
@@ -676,14 +711,14 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo):
                     if texto.find('http') != -1:
                         # Todos los http
                         n_links = len(re.findall(r'(http)', texto, re.M | re.I))
-                        print('LINKS ENCONTRADOS: ', n_links)
+                        #print('LINKS ENCONTRADOS: ', n_links)
 
                     # Busca links
                     n_links_r = len(re.findall(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''', texto, re.M | re.I))
                     if n_links_r != 0:
                         # Reemplaza todos los LINKS (http) (sin ADJUNTOS y EMOJIS)
                         texto = re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''', '[LINK]', texto)
-                        print('LINKS REEMPLAZADOS: ', n_links_r, texto)
+                        #print('LINKS REEMPLAZADOS: ', n_links_r, texto)
 
                     #
                     # DIFERENCIAS (len(nombre_foro) + len(tit_hilo) + len(tit_mensaje) + len(texto))
@@ -734,20 +769,24 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo):
                     else:
 
                         # Padre-Hijo en días
-                        date_ph = abs(datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S") - date_padre).total_seconds()  # (fecha + ' ' + hora) - date_padre
+                        date_ph = abs(datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S") -
+                                      date_padre).total_seconds()  # (fecha + ' ' + hora) - date_padre
 
                         # Antecesor-Sucesor en segundos
-                        date_as = abs(datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S") - date_antecesor).total_seconds()  # (fecha + ' ' + hora) - date_antecesor
+                        date_as = abs(datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S") -
+                                      date_antecesor).total_seconds()  # (fecha + ' ' + hora) - date_antecesor
 
                         date_antecesor = datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S")  # fecha + ' ' + hora
 
                         # 1er Mensaje
                         if len(mensajes) == 0:
-                            print(date_ph, date_as)
+                            print()
+                            #print(date_ph, date_as)
 
                     # DISTANCIA AL ORIGEN #
                     # Permite ordenar por fecha de forma directa #
-                    date_origen = abs(datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S") - datetime.strptime('01/01/2010 00:00:00', "%d/%m/%Y %H:%M:%S")).total_seconds()
+                    date_origen = abs(datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S") - datetime.strptime(
+                        '01/09/' + curso + ' 00:00:00', "%d/%m/%Y %H:%M:%S")).total_seconds()
 
                     #
                     # TIPOS MENSAJE (INICIAL, RESPUESTA o TERMINAL)
@@ -829,18 +868,19 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo):
                     # ANÁLISIS del TEXTO
                     #
                     var_token = tokenizado(texto.strip())
-                    print('TOKENIZADO')
-                    #print('TOKENIZADO(', n_mensajes_hilo, '): ', var_token)
+                    #print('TOKENIZADO MENSAJE')
+                    #print('TOKENIZADO MENSAJE(', n_mensajes_hilo, '): ', var_token)
 
                     var_raiz = enraizado()
-                    print('RAICES')
-                    #print('RAICES(', var_token, '): ', var_raiz)
+                    #print('RAICES MENSAJE')
+                    #print('RAICES MENSAJE(', var_token, '): ', var_raiz)
 
+                    #print('POSTAG MENSAJE' + len(mensajes) + ':')
                     #var_pos = postag(texto.strip())
-                    #print('POSTAG(', var_raiz, '): ', var_pos)
+                    #print('POSTAG MENSAJE(', var_raiz, '): ', var_pos)
 
                     #var_clu = cluster()
-                    #print('CLUSTER: ', var_clu)
+                    #print('CLUSTER MENSAJE: ', var_clu)
 
                     # exit(999)
 
@@ -860,7 +900,7 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo):
                     # CLUSTERING de MENASJE
                     #
                     #var_clu = cluster()
-                    #print('CLUSTER: ', var_clu)
+                    #print('CLUSTER MENSAJE: ', var_clu)
 
                     # exit(999)
 
@@ -871,36 +911,6 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo):
                     # Derfinición de MENSAJE (ampliado)
                     ########################
                     # mensaje=[tit_hilo, id_hilo, id_mensaje, id_ref_mensaje, id_autor, autor, dia_semana, fecha, tit_mensaje, texto]
-                    mensaje = {
-                        # BASE #
-                        'Asignatura': int(id_asig),
-                        'Foro': id_foro, 'Nombre foro': nombre_foro, 'Caracteres foro': len(nombre_foro),
-                        'Hilo': id_hilo, 'Título': tit_hilo, 'Caracteres hilo': len(tit_hilo),
-                        'Mensaje': id_mensaje, 'Responde a': id_ref_mensaje,
-                        'Remitente': id_autor, 'Autor': autor,
-                        # TIPO INICIAL, TERMINAL, RESPUESTA Y AUTO-RESPUESTA
-                        'Inicial': inicial, 'Respuesta': respuesta, 'Auto-respuesta': auto_respuesta, 'Terminal': terminal,
-                        # DISTANCIAS Padre-Hijo Antecesor-Sucesor
-                        'Día': dia_semana,
-                        'Fecha': fecha, 'Hora': hora, 'Date': fecha + ' ' + hora,
-                        'Distancia PH': int(date_ph), 'Distancia AS': int(date_as), 'Distancia OO': int(date_origen),
-                        # DIFERENCIAS Padre-Hijo Antecesor-Sucesor
-                        'Título mensaje': tit_mensaje, 'Caracteres título mensaje': len(tit_mensaje),
-                        'Texto mensaje': texto.strip(), 'Caracteres texto mensaje': len(texto),
-                        'Diferencia PH': size_ph, 'Diferencia AS': size_as,
-                        # ANÁLISIS de TEXTO
-                        # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
-                        'Tokens':  var_token,  # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras, 'ns': numero de stopwords}
-                        "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'), 'ns': var_token.get('ns'),
-                        # .SnowballStemmer("spanish").stem,
-                        'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas(Cantidad de información)}
-                        'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
-                        # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
-                        'Postag': var_pos,  # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
-                        'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
-                        'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links,
-                        'Curso': int(curso),
-                    }
                     if tipo == 'cluster':
                         mensaje = {
                             # BASE #
@@ -920,7 +930,7 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo):
                             'Día': int(dia_semana_nombre[dia_semana]),
                             #'Fecha': fecha, 'Hora': hora,
                             'Date': abs(datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S") - datetime.strptime(
-                                  '01/01/2010 00:00:00', "%d/%m/%Y %H:%M:%S")).total_seconds(),
+                                  '01/09/' + curso + ' 00:00:00', "%d/%m/%Y %H:%M:%S")).total_seconds(),
                             'Distancia PH': int(date_ph), 'Distancia AS': int(date_as), 'Distancia OO': int(date_origen),
                             # DIFERENCIAS Padre-Hijo Antecesor-Sucesor
                             #'Título mensaje': tit_mensaje,
@@ -931,23 +941,53 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo):
                             # ANÁLISIS de TEXTO
                             # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
                             #'Tokens': var_token,  # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras, 'ns': numero de stopwords}
-                            "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'),
-                            'np': var_token.get('np'), 'ns': var_token.get('ns'),
+                            "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'), 'ns': var_token.get('ns'),
                             # .SnowballStemmer("spanish").stem,
                             #'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas(Cantidad de información)}
                             'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
                             # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
                             #'Postag': var_pos,  # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
-                            #'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
+                            # PoS: # 'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
                             'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links,
                             'Curso': int(curso),
                         }
                     elif tipo == 'clasificador':
                         mensaje = {}
+                    else:
+                        mensaje = {
+                            # BASE #
+                            'Asignatura': int(id_asig),
+                            'Foro': id_foro, 'Nombre foro': nombre_foro, 'Caracteres foro': len(nombre_foro),
+                            'Hilo': id_hilo, 'Título': tit_hilo, 'Caracteres hilo': len(tit_hilo),
+                            'Mensaje': id_mensaje, 'Responde a': id_ref_mensaje,
+                            'Remitente': id_autor, 'Autor': autor,
+                            # TIPO INICIAL, TERMINAL, RESPUESTA Y AUTO-RESPUESTA
+                            'Inicial': inicial, 'Respuesta': respuesta, 'Auto-respuesta': auto_respuesta, 'Terminal': terminal,
+                            # DISTANCIAS Padre-Hijo Antecesor-Sucesor
+                            'Día': dia_semana,
+                            'Fecha': fecha, 'Hora': hora, 'Date': fecha + ' ' + hora,
+                            'Distancia PH': int(date_ph), 'Distancia AS': int(date_as), 'Distancia OO': int(date_origen),
+                            # DIFERENCIAS Padre-Hijo Antecesor-Sucesor
+                            'Título mensaje': tit_mensaje, 'Caracteres título mensaje': len(tit_mensaje),
+                            'Texto mensaje': texto.strip(), 'Caracteres texto mensaje': len(texto),
+                            'Diferencia PH': size_ph, 'Diferencia AS': size_as,
+                            # ANÁLISIS de TEXTO
+                            # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
+                            'Tokens':  var_token,  # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras, 'ns': numero de stopwords}
+                            "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'), 'ns': var_token.get('ns'),
+                            # .SnowballStemmer("spanish").stem,
+                            'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas(Cantidad de información)}
+                            'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
+                            # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
+                            # 'Postag': var_pos,  # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
+                            # PoS: # 'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
+                            'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links,
+                            'Curso': int(curso),
+                        }
 
                     mensajes.append(mensaje)
 
-                    ## Limpia variables
+                    # Limpia variables
                     texto = ""
                     autor = ""
                     # print(linea)
@@ -971,7 +1011,7 @@ def generar_mensajes(mensajes, campo, ruta, id_asig, curso_asig, tipo):
     curso = curso_asig
 
     # Variables Globales
-    foto = {}
+    mensaje = {}
     # Interruptores
     msj_previo = 0
 
@@ -993,6 +1033,8 @@ def generar_mensajes(mensajes, campo, ruta, id_asig, curso_asig, tipo):
     elif tipo == 'cluster':
         mensaje = {}
     elif tipo == 'clasificador':
+        mensaje = {}
+    else:
         mensaje = {}
 
     mensajes.append(mensaje)
@@ -1021,11 +1063,11 @@ def generar_hilos(mensajes, campo, curso_asig, tipo):
         # interruptor de cambio de hilo #
         cambia_subhilo = 1
     except NameError:
-        print("well, it WASN'T defined after all!")
+        #print("well, it WASN'T defined after all!")
         id_hilo_anterior = 0
         cambia_subhilo = 1
     else:
-        print("sure, it was defined.")
+        #print("sure, it was defined.")
         id_hilo_anterior = 0
         cambia_subhilo = 1
     # Fin excepción
@@ -1043,6 +1085,23 @@ def generar_hilos(mensajes, campo, curso_asig, tipo):
     n_auto_respuestas = 0
     longitud = 0  # Tamaño texto
     distancia = 0  # Duración
+    # ACUMULADOS ANÁLISIS TEXTO
+    lc = 0
+    nt = 0
+    nf = 0
+    np = 0
+    ns = 0
+    nr = 0
+    nrd = 0
+    nn = 0
+    nnd = 0
+    nv = 0
+    nvd = 0
+    # ACUMULADOS ADJUNTOS
+    n_adjs = 0
+    t_adj = 0
+    n_emojis = 0
+    n_links = 0
 
     # Fecha
     fecha = ''
@@ -1103,6 +1162,24 @@ def generar_hilos(mensajes, campo, curso_asig, tipo):
         autor = mensaje['Remitente']
         # ETIQUETA ULTIMO MENSAJE DEL HILO
         terminal = mensaje['Terminal']
+
+        # ACUMULADOS ANÁLISIS TEXTO
+        lc += mensaje['lc']
+        nt += mensaje['nt']
+        nf += mensaje['nf']
+        np += mensaje['np']
+        ns += mensaje['ns']
+        nr += mensaje['nr']
+        nrd += mensaje['nrd']
+        #nn += mensaje['nn']
+        #nnd += mensaje['nnd']
+        #nv += mensaje['nv']
+        #nvd += mensaje['nvd']
+        # ACUMULADOS ADJUNTOS
+        n_adjs += mensaje['Adjuntos']
+        t_adj += mensaje['Tamaño adjuntos']
+        n_emojis += mensaje['Emojis']
+        n_links += mensaje['Links']
 
         # Nº MENSAJES #
         n_mensajes += 1
@@ -1180,7 +1257,7 @@ def generar_hilos(mensajes, campo, curso_asig, tipo):
             if respuesta != 0:
                 # MENSAJE NUEVO SUBHILO
                 if cambia_subhilo * respuesta < 0:
-                    print(index, id_hilo, 'Nuevo SUBHILOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO', respuesta, n_subhilos)
+                    #print(index, id_hilo, 'Nuevo SUBHILOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO', respuesta, n_subhilos)
                     cambia_subhilo = cambia_subhilo * -1
                     # Cuenta las Ramificaciones del hilo principal (-1,1)
                     if respuesta != 1 and respuesta != -1:
@@ -1188,12 +1265,13 @@ def generar_hilos(mensajes, campo, curso_asig, tipo):
                     n_mensajes_medio_subhilo = 1
                 # MENSAJE MISMO SUBHILO #
                 else:
-                    print(index, id_hilo, 'Mensaje de tipo respuesta') # ,'Mensaje de tipo respuesta del mismo subhilo', respuesta)
+                    #print(index, id_hilo, 'Mensaje de tipo respuesta') # ,'Mensaje de tipo respuesta del mismo subhilo', respuesta)
                     n_mensajes_medio_subhilo += 1
                     # ULTIMO MENSAJE DEL HILO Y del último SUBHILO del HILO
                     #########################
                     if terminal == -1:
-                        print(index, id_hilo, 'Mensaje de tipo respuesta último del hilo')
+                        print()
+                        #print(index, id_hilo, 'Mensaje de tipo respuesta último del hilo')
             # MENSAJE NO RESPUESTA #
             else:
                 n_hilos += 1
@@ -1202,7 +1280,7 @@ def generar_hilos(mensajes, campo, curso_asig, tipo):
         # NUEVO HILO (INICIALIZAR) #
         ############################
         else:
-            print(index, id_hilo, 'Nuevo HILOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO', respuesta)
+            #print(index, id_hilo, 'Nuevo HILOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO', respuesta)
 
             # CONTADOR HILOS
             n_hilos += 1
@@ -1283,7 +1361,7 @@ def generar_hilos(mensajes, campo, curso_asig, tipo):
             # Excepción:
             try:
                 # MODA
-                print("MODA_T:", len(contador_tiempos_previos_ph), max(contador_tiempos_previos_ph))
+                #print("MODA_T:", len(contador_tiempos_previos_ph), max(contador_tiempos_previos_ph))
                 max_tiempos_ph = max(lista_tiempos_previos_ph)
                 min_tiempos_ph = min(lista_tiempos_previos_ph)
 
@@ -1291,20 +1369,20 @@ def generar_hilos(mensajes, campo, curso_asig, tipo):
                 index = idx[np.argmax(counts)]
                 moda_tiempos_ph = lista_tiempos_previos_ph[index]
 
-                print("MODA_T:", moda_tiempos_ph)
+                #print("MODA_T:", moda_tiempos_ph)
 
             except NameError:
-                print("well, it WASN'T defined after all! (MODA_T)")
+                #print("well, it WASN'T defined after all! (MODA_T)")
                 moda_tiempos_ph = 0
             else:
-                print("sure, it was defined. (MODA_T)")
+                #print("sure, it was defined. (MODA_T)")
                 moda_tiempos_ph = moda_tiempos_ph
             # Fin excepción
             rango_tiempos_ph = sorted(lista_tiempos_previos_ph)[len(lista_tiempos_previos_ph)-1] - sorted(lista_tiempos_previos_ph)[0]
-            print("MediaTph: ", media_tiempos_ph)
-            print("MedianaTph: ", mediana_tiempos_ph)
-            print("ModaTph: ", moda_tiempos_ph)
-            print("RangoTph: ", rango_tiempos_ph)
+            #print("MediaTph: ", media_tiempos_ph)
+            #print("MedianaTph: ", mediana_tiempos_ph)
+            #print("ModaTph: ", moda_tiempos_ph)
+            #print("RangoTph: ", rango_tiempos_ph)
 
             # AS
             # CALCULAR TIEMPOS #
@@ -1313,7 +1391,7 @@ def generar_hilos(mensajes, campo, curso_asig, tipo):
             # Excepción:
             try:
                 # MODA
-                print("MODA_T:", len(contador_tiempos_previos), max(contador_tiempos_previos))
+                #print("MODA_T:", len(contador_tiempos_previos), max(contador_tiempos_previos))
                 max_tiempos = max(lista_tiempos_previos)
                 min_tiempos = min(lista_tiempos_previos)
 
@@ -1321,20 +1399,20 @@ def generar_hilos(mensajes, campo, curso_asig, tipo):
                 index = idx[np.argmax(counts)]
                 moda_tiempos = lista_tiempos_previos[index]
 
-                print("MODA_T:", moda_tiempos)
+                #print("MODA_T:", moda_tiempos)
 
             except NameError:
-                print("well, it WASN'T defined after all! (MODA_T)")
+                #print("well, it WASN'T defined after all! (MODA_T)")
                 moda_tiempos = 0
             else:
-                print("sure, it was defined. (MODA_T)")
+                #print("sure, it was defined. (MODA_T)")
                 moda_tiempos = moda_tiempos
             # Fin excepción
             rango_tiempos = sorted(lista_tiempos_previos)[len(lista_tiempos_previos)-1] - sorted(lista_tiempos_previos)[0]
-            print("MediaT: ", media_tiempos)
-            print("MedianaT: ", mediana_tiempos)
-            print("ModaT: ", moda_tiempos)
-            print("RangoT: ", rango_tiempos)
+            #print("MediaT: ", media_tiempos)
+            #print("MedianaT: ", mediana_tiempos)
+            #print("ModaT: ", moda_tiempos)
+            #print("RangoT: ", rango_tiempos)
 
             # TAMAÑO
             la_longitud = mensaje['Caracteres texto mensaje']
@@ -1344,7 +1422,7 @@ def generar_hilos(mensajes, campo, curso_asig, tipo):
             # Excepción:
             try:
                 # MODA
-                print("MODA_L:", len(contador_longitudes_previas), max(contador_longitudes_previas))
+                #print("MODA_L:", len(contador_longitudes_previas), max(contador_longitudes_previas))
                 max_longitudes = max(lista_longitudes_previas)
                 min_longitudes = min(lista_longitudes_previas)
 
@@ -1352,20 +1430,20 @@ def generar_hilos(mensajes, campo, curso_asig, tipo):
                 index = idx[np.argmax(counts)]
                 moda_longitudes = lista_longitudes_previas[index]
 
-                print("MODA_L:", moda_longitudes)
+                #print("MODA_L:", moda_longitudes)
 
             except NameError:
-                print("well, it WASN'T defined after all! (MODA_L)")
+                #print("well, it WASN'T defined after all! (MODA_L)")
                 moda_longitudes = 0
             else:
-                print("sure, it was defined. (MODA_L)")
+                #print("sure, it was defined. (MODA_L)")
                 moda_longitudes = moda_longitudes
             # Fin excepción
             rango_longitudes = sorted(lista_longitudes_previas)[len(lista_longitudes_previas)-1] - sorted(lista_longitudes_previas)[0]
-            print("MediaL: ", media_longitudes)
-            print("MedianaL: ", mediana_longitudes)
-            print("ModaL: ", moda_longitudes)
-            print("RangoL: ", rango_longitudes)
+            #print("MediaL: ", media_longitudes)
+            #print("MedianaL: ", mediana_longitudes)
+            #print("ModaL: ", moda_longitudes)
+            #print("RangoL: ", rango_longitudes)
 
             # LONGITUD MEDIA #
             longitud_media = longitud / n_mensajes
@@ -1391,15 +1469,17 @@ def generar_hilos(mensajes, campo, curso_asig, tipo):
             #
             # ANÁLISIS de los TEXTOS de un HILO
             #
-            var_token = tokenizado(textos_mensajes.strip())
+            #var_token = tokenizado(textos_mensajes.strip())
+            #print('TOKENIZADO HILOS')
             #print('TOKENIZADO(', n_mensajes, '): ', var_token)
-            print('TOKENIZADO')
 
-            var_raiz = enraizado()
+            #var_raiz = enraizado()
+            #print('RAICES HILOS')
             #print('RAICES: ', var_raiz)
-            print('RAICES')
 
-            #var_pos = postag(textos_mensajes.strip())
+            print('POSTAG HILO' + n_hilos + ':')
+            var_pos = postag(textos_mensajes.strip())
+            print('POSTAG HILO')
             #print('POSTAG: ', var_pos)
 
             # var_clu = cluster()
@@ -1420,7 +1500,82 @@ def generar_hilos(mensajes, campo, curso_asig, tipo):
             # Derfinición de HILO
             ########################
             # hilo = [tit_hilo, id_hilo, dia_semana, fecha, n_mensajes, n_autores, n_subhilos, n_auto_respuestas, longitud, distancia, longitud_media, distancia_media]
-            hilo = {
+            if tipo == 'cluster':
+                from datetime import datetime
+                hilo = {
+                    # BASE #
+                    # MENSAJES #
+                    'Asignatura': int(mensaje['Asignatura']),
+                    #'Foro': mensaje['Foro'], 'Nombre foro': mensaje['Nombre foro'],
+                    'Caracteres foro': mensaje['Caracteres foro'],
+                    #'Hilo': mensaje['Hilo'], 'Título': mensaje['Título'],
+                    'Caracteres hilo': mensaje['Caracteres hilo'],
+                    'Nº autores': n_autores,
+                    'Nº foro': n_foros,
+                    'Nº hilo': n_hilos,
+                    'Nº mensajes': n_mensajes,
+                    'Nº auto-respuestas': n_auto_respuestas,
+                    'Nº subhilos': n_subhilos,
+                    # MENSAJES x SUBHILO
+                    'Mensajes medios por subhilo': n_mensajes_medio_subhilo,
+                    #    'Mensaje': id_mensaje, 'Responde a': id_ref_mensaje,
+                    #    'Remitente': id_autor, 'Autor': autor,
+                    # TIPO INICIAL, TERMINAL, RESPUESTA Y AUTO-RESPUESTA
+                    #    'Inicial': inicial, 'Respuesta': respuesta, 'Auto-respuesta': auto_respuesta, 'Terminal': terminal,
+                    # DISTANCIAS Padre-Hijo Antecesor-Sucesor
+                    #    'Día': dia_semana, 'Fecha': fecha, 'Hora': hora,
+                    'Date': abs(datetime.strptime(fecha, "%d/%m/%Y %H:%M:%S") - datetime.strptime(
+                        '01/09/' + curso + ' 00:00:00', "%d/%m/%Y %H:%M:%S")).total_seconds(),
+                    # DISTANCIA y DISTANCIA MEDIA #
+                    'Distancia': distancia,
+                    'Distancia / Mensajes': distancia_media,
+                    #    'Distancia PH': date_ph
+                    'Distancia MaxTph': max_tiempos_ph,
+                    'Distancia MinTph': min_tiempos_ph,
+                    'MediaTph': media_tiempos_ph,
+                    'MedianaTph': mediana_tiempos_ph,
+                    'ModaTph': moda_tiempos_ph,
+                    'RangoTph': rango_tiempos_ph,
+                    #    'Distancia AS': date_as,
+                    'Distancia MaxTas': max_tiempos,
+                    'Distancia MinTs': min_tiempos,
+                    'MediaTas': media_tiempos,
+                    'MedianaTas': mediana_tiempos,
+                    'ModaTas': moda_tiempos,
+                    'RangoTas': rango_tiempos,
+                    # DIFERENCIAS TAMAÑO Padre-Hijo Antecesor-Sucesor
+                    'Longitud': longitud,
+                    'Longitud media': longitud_media,
+                    'Longitud Max': max_longitudes,
+                    'Longitud Min': min_longitudes,
+                    'MediaL': media_longitudes,
+                    'MedianaL': mediana_longitudes,
+                    'ModaL': moda_longitudes,
+                    'RangoL': rango_longitudes,
+                    #'Título mensaje': titulos_mensajes,
+                    'Caracteres títulos mensajes': len(titulos_mensajes) - n_mensajes - 1,  # Espacios en blanco de separacion de los títulos
+                    #'Texto mensaje': textos_mensajes.strip(),
+                    'Caracteres texto mensajes': len(textos_mensajes) - n_mensajes - 1,  # Espacios en blanco de separacion de los textos
+                    # ANÁLISIS de TEXTO
+                    # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
+                    #    'Tokens': var_token,  # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras, 'ns': numero de stopwords}
+                    #    "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'), 'ns': var_token.get('ns'),
+                    "lc": lc, 'nt': nt, 'nf': nf, 'np': np, 'ns': ns,
+                    # .SnowballStemmer("spanish").stem,
+                    #    'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas(Cantidad de información)}
+                    #    'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
+                    'nr': nr, 'nrd': nrd,
+                    # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
+                    #    'Postag': var_pos,  # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
+                    #    'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
+                    # PoS: # 'nn': nn, 'nv': nv, 'nnd': nnd, 'nvd': nvd,
+                    'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links,
+                    'Curso': int(curso),
+                }
+            elif tipo == 'clasificador':
+                hilo = {}
+            else:
+                hilo = {
                     # BASE #
                     # MENSAJES #
                     'Asignatura': mensaje['Asignatura'],
@@ -1436,7 +1591,7 @@ def generar_hilos(mensajes, campo, curso_asig, tipo):
                     # MENSAJES x SUBHILO
                     'Mensajes medios por subhilo': n_mensajes_medio_subhilo,
                     #    'Mensaje': id_mensaje, 'Responde a': id_ref_mensaje,
-                    #    'Remitente': id_autor, 'Autor': autor,
+                    'Remitente': autores_previos[0], 'Autor': autores_previos[0],
                     # TIPO INICIAL, TERMINAL, RESPUESTA Y AUTO-RESPUESTA
                     #    'Inicial': inicial, 'Respuesta': respuesta, 'Auto-respuesta': auto_respuesta, 'Terminal': terminal,
                     # DISTANCIAS Padre-Hijo Antecesor-Sucesor
@@ -1468,99 +1623,26 @@ def generar_hilos(mensajes, campo, curso_asig, tipo):
                     'MedianaL': mediana_longitudes,
                     'ModaL': moda_longitudes,
                     'RangoL': rango_longitudes,
-                    'Títulos mensajes': titulos_mensajes,
-                    'Caracteres títulos mensajes': len(titulos_mensajes) - n_mensajes - 1,
-                # Espacios en blanco de separacion de los títulos
-                    'Texto mensaje': textos_mensajes.strip(),
-                    'Caracteres texto mensajes': len(textos_mensajes) - n_mensajes - 1,
-                # Espacios en blanco de separacion de los textos
-                    # ANÁLISIS de TEXTO
-                    # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
-                    #    'Tokens': var_token,
-                    # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras, 'ns': numero de stopwords}
-                    #    "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'),
-                    #    'ns': var_token.get('ns'),
-                    # .SnowballStemmer("spanish").stem,
-                    #    'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas(Cantidad de información)}
-                    #    'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
-                    # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
-                    #    'Postag': var_pos,
-                    # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
-                    #    'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
-                    #    'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links,
-                    'Curso': curso,
-                }
-            if tipo == 'cluster':
-                from datetime import datetime
-                hilo = {
-                    # BASE #
-                    # MENSAJES #
-                    'Asignatura': int(mensaje['Asignatura']),
-                    #'Foro': mensaje['Foro'], 'Nombre foro': mensaje['Nombre foro'],
-                    'Caracteres foro': mensaje['Caracteres foro'],
-                    #'Hilo': mensaje['Hilo'], 'Título': mensaje['Título'],
-                    'Caracteres hilo': mensaje['Caracteres hilo'],
-                    'Nº autores': n_autores,
-                    'Nº foro': n_foros,
-                    'Nº hilo': n_hilos,
-                    'Nº mensajes': n_mensajes,
-                    'Nº auto-respuestas': n_auto_respuestas,
-                    'Nº subhilos': n_subhilos,
-                    # MENSAJES x SUBHILO
-                    'Mensajes medios por subhilo': n_mensajes_medio_subhilo,
-                    #    'Mensaje': id_mensaje, 'Responde a': id_ref_mensaje,
-                    #    'Remitente': id_autor, 'Autor': autor,
-                    # TIPO INICIAL, TERMINAL, RESPUESTA Y AUTO-RESPUESTA
-                    #    'Inicial': inicial, 'Respuesta': respuesta, 'Auto-respuesta': auto_respuesta, 'Terminal': terminal,
-                    # DISTANCIAS Padre-Hijo Antecesor-Sucesor
-                    #    'Día': dia_semana, 'Fecha': fecha, 'Hora': hora,
-                    'Date': abs(datetime.strptime(fecha, "%d/%m/%Y %H:%M:%S") - datetime.strptime('01/01/2010 00:00:00', "%d/%m/%Y %H:%M:%S")).total_seconds(),
-                    # DISTANCIA y DISTANCIA MEDIA #
-                    'Distancia': distancia,
-                    'Distancia / Mensajes': distancia_media,
-                    #    'Distancia PH': date_ph
-                    'Distancia MaxTph': max_tiempos_ph,
-                    'Distancia MinTph': min_tiempos_ph,
-                    'MediaTph': media_tiempos_ph,
-                    'MedianaTph': mediana_tiempos_ph,
-                    'ModaTph': moda_tiempos_ph,
-                    'RangoTph': rango_tiempos_ph,
-                    #    'Distancia AS': date_as,
-                    'Distancia MaxTas': max_tiempos,
-                    'Distancia MinTs': min_tiempos,
-                    'MediaTas': media_tiempos,
-                    'MedianaTas': mediana_tiempos,
-                    'ModaTas': moda_tiempos,
-                    'RangoTas': rango_tiempos,
-                    # DIFERENCIAS TAMAÑO Padre-Hijo Antecesor-Sucesor
-                    'Longitud': longitud,
-                    'Longitud media': longitud_media,
-                    'Longitud Max': max_longitudes,
-                    'Longitud Min': min_longitudes,
-                    'MediaL': media_longitudes,
-                    'MedianaL': mediana_longitudes,
-                    'ModaL': moda_longitudes,
-                    'RangoL': rango_longitudes,
-                    #'Títulos mensajes': titulos_mensajes,
+                    'Título mensaje': titulos_mensajes,
                     'Caracteres títulos mensajes': len(titulos_mensajes) - n_mensajes - 1,  # Espacios en blanco de separacion de los títulos
-                    #'Texto mensaje': textos_mensajes.strip(),
+                    'Texto mensaje': textos_mensajes.strip(),
                     'Caracteres texto mensajes': len(textos_mensajes) - n_mensajes - 1,  # Espacios en blanco de separacion de los textos
                     # ANÁLISIS de TEXTO
                     # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
-                    #    'Tokens': var_token,
-                    # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras, 'ns': numero de stopwords}
-                    "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'), 'ns': var_token.get('ns'),
+                    #    'Tokens': var_token,  # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras, 'ns': numero de stopwords}
+                    #    "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'), 'ns': var_token.get('ns'),
+                    "lc": lc, 'nt': nt, 'nf': nf, 'np': np, 'ns': ns,
                     # .SnowballStemmer("spanish").stem,
                     #    'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas(Cantidad de información)}
-                    'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
+                    #    'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
+                    'nr': nr, 'nrd': nrd,
                     # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
                     #    'Postag': var_pos,  # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
-                    #'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
-                    #    'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links,
-                    'Curso': curso,
+                    #    'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
+                    # PoS: # 'nn': nn, 'nv': nv, 'nnd': nnd, 'nvd': nvd,
+                    'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links,
+                    'Curso': int(curso),
                 }
-            elif tipo == 'clasificador':
-                hilo = {}
 
             # INICIALIZAR AUTORES #
             autores_previos = []
@@ -1568,6 +1650,24 @@ def generar_hilos(mensajes, campo, curso_asig, tipo):
             longitud = 0
             n_mensajes = 0
             distancia = 0
+
+            # ACUMULADOS ANÁLISIS TEXTO
+            lc = 0
+            nt = 0
+            nf = 0
+            np = 0
+            ns = 0
+            nr = 0
+            nrd = 0
+            nn = 0
+            nnd = 0
+            nv = 0
+            nvd = 0
+            # ACUMULADOS ADJUNTOS
+            n_adjs = 0
+            t_adj = 0
+            n_emojis = 0
+            n_links = 0
 
             # AÑADIR HILO #
             hilos.append(hilo)
@@ -1596,11 +1696,11 @@ def generar_autores(mensajes, hilos, campo, curso_asig, tipo):
         # interruptor de cambio de autor #
         cambia_autor = 1
     except NameError:
-        print("well, it WASN'T defined after all!")
+        #print("well, it WASN'T defined after all!")
         id_autor_anterior = 0
         cambia_autor = 1
     else:
-        print("sure, it was defined.")
+        #print("sure, it was defined.")
         id_autoranterior = 0
         cambia_autor = 1
     # Fin excepción
@@ -1681,6 +1781,24 @@ def generar_autores(mensajes, hilos, campo, curso_asig, tipo):
 
     n_mensajes_medio_subhilo = 0
 
+    # ACUMULADOS ANÁLISIS TEXTO
+    lc = 0
+    nt = 0
+    nf = 0
+    np = 0
+    ns = 0
+    nr = 0
+    nrd = 0
+    nn = 0
+    nnd = 0
+    nv = 0
+    nvd = 0
+    # ACUMULADOS ADJUNTOS
+    n_adjs = 0
+    t_adj = 0
+    n_emojis = 0
+    n_links = 0
+
     # Texto
     textos_mensajes = ''
     titulos_mensajes = ''
@@ -1706,6 +1824,7 @@ def generar_autores(mensajes, hilos, campo, curso_asig, tipo):
 
         # X MENSAJE
         n_mensajes += 1
+
         # INICIADOR, RESPONDEDOR Y TERMINADOR
         # ETIQUETA PRIMER MENSAJE DE HILO
         inicial = mensaje['Inicial']
@@ -1749,8 +1868,8 @@ def generar_autores(mensajes, hilos, campo, curso_asig, tipo):
         # DISTANCIA AL ORIGEN #
         # Permite ordenar por fecha de forma directa #
         date_origen = abs(
-            datetime.strptime(date, "%d/%m/%Y %H:%M:%S") - datetime.strptime('01/01/2010 00:00:00',
-                                                                                           "%d/%m/%Y %H:%M:%S")).total_seconds()
+            datetime.strptime(date, "%d/%m/%Y %H:%M:%S") - datetime.strptime(
+                '01/09/' + curso + ' 00:00:00', "%d/%m/%Y %H:%M:%S")).total_seconds()
 
         # print('LISTAS ', lista_tiempos_previos, lista_tiempos_previos_ph, lista_tiempos_previos_as)
         #
@@ -1794,6 +1913,24 @@ def generar_autores(mensajes, hilos, campo, curso_asig, tipo):
             longitudes_previas.append(la_longitud)
             # Array de índices de longitudes
             contador_longitudes_previas.insert(longitudes_previas.index(la_longitud), 1)
+        #
+        # ACUMULADOS ANÁLISIS TEXTO
+        lc += mensaje['lc']
+        nt += mensaje['nt']
+        nf += mensaje['nf']
+        np += mensaje['np']
+        ns += mensaje['ns']
+        nr += mensaje['nr']
+        nrd += mensaje['nrd']
+        #nn += mensaje['nn']
+        #nnd += mensaje['nnd']
+        #nv += mensaje['nv']
+        #nvd += mensaje['nvd']
+        # ACUMULADOS ADJUNTOS
+        n_adjs += mensaje['Adjuntos']
+        t_adj += mensaje['Tamaño adjuntos']
+        n_emojis += mensaje['Emojis']
+        n_links += mensaje['Links']
         #
         # TEXTOS #
         titulos_mensajes += ' ' + mensaje['Título mensaje']
@@ -1876,18 +2013,18 @@ def generar_autores(mensajes, hilos, campo, curso_asig, tipo):
             from procesadoGeneral import cluster
 
             #
-            # ANÁLISIS de los TEXTOS de un HILO
+            # ANÁLISIS de los TEXTOS de un AUTOR
             #
-            var_token = tokenizado(textos_mensajes.strip())
-            #print('TOKENIZADO(', n_mensajes, '): ', var_token)
-            print('TOKENIZADO')
+            #var_token = tokenizado(textos_mensajes.strip())
+            #print('TOKENIZADO AUTOR')
+            #print('TOKENIZADO AUTOR(', n_mensajes, '): ', var_token)
 
-            var_raiz = enraizado()
-            #print('RAICES: ', var_raiz)
-            print('RAICES')
+            #var_raiz = enraizado()
+            #print('RAICES AUTOR')
+            #print('RAICES AUTOR: ', var_raiz)
 
             #var_pos = postag(textos_mensajes.strip())
-            #print('POSTAG: ', var_pos)
+            #print('POSTAG AUTOR: ', var_pos)
 
             # var_clu = cluster()
             # print('CLUSTER: ', var_clu)
@@ -1906,7 +2043,83 @@ def generar_autores(mensajes, hilos, campo, curso_asig, tipo):
             # Derfinición de AUTOR
             ########################
             # autor = [tit_hilo, id_hilo, dia_semana, fecha, n_mensajes, n_autores, n_subhilos, n_auto_respuestas, longitud, distancia, longitud_media, distancia_media]
-            autor = {
+            if tipo == 'cluster':
+                autor = {
+                    # BASE #
+                    # MENSAJES #
+                    'Asignatura': int(mensaje['Asignatura']),
+                    # 'Foro': mensaje['Foro'], 'Nombre foro': mensaje['Nombre foro'],
+                    # 'Caracteres foro': mensaje['Caracteres foro'],
+                    # 'Hilo': mensaje['Hilo'], 'Título': mensaje['Título'], 'Caracteres hilo': mensaje['Caracteres hilo'],
+                    'Nº autores': n_autores,
+                    'Nº foros': n_foros,
+                    'Nº hilos': n_hilos,
+                    'Nº mensajes': n_mensajes,
+                    #'Nº auto-respuestas': n_auto_respuestas,
+                    #'Nº subhilos': n_subhilos,
+                    # MENSAJES x SUBHILO
+                    #'Mensajes medios por subhilo': n_mensajes_medio_subhilo,
+                    #'Mensaje': mensaje['Mensaje'], 'Responde a': mensaje['Responde a'],
+                    'Remitente': id_autor, 'Autor': id_autor,
+                    # TIPO INICIAL, TERMINAL, RESPUESTA Y AUTO-RESPUESTA
+                    'Iniciales': n_iniciales, 'Respuestas': n_respuestas,
+                    'Auto-respuestas': n_auto_respuestas, 'Terminales': n_terminales,
+                    # DISTANCIAS Padre-Hijo Antecesor-Sucesor
+                    #    'Día': dia_semana, 'Fecha': fecha, 'Hora': hora,
+                    'Date': abs(datetime.strptime(date, "%d/%m/%Y %H:%M:%S") - datetime.strptime(
+                        '01/09/' + curso + ' 00:00:00', "%d/%m/%Y %H:%M:%S")).total_seconds(),
+                    # DISTANCIA y DISTANCIA MEDIA #
+                    'Distancia': distancia,
+                    'Distancia / Mensajes': distancia_media,
+                    'Distancia Max': max_tiempos,
+                    'Distancia Min': min_tiempos,
+                    #    'Distancia PH': date_ph
+                    'Distancia MaxTph': max_tiempos_ph,
+                    'Distancia MinTph': min_tiempos_ph,
+                    'MediaTph': media_tiempos_ph,
+                    'MedianaTph': mediana_tiempos_ph,
+                    'ModaTph': moda_tiempos_ph,
+                    'RangoTph': rango_tiempos_ph,
+                    #    'Distancia AS': date_as,
+                    'Distancia MaxTas': max_tiempos_as,
+                    'Distancia MinTs': min_tiempos_as,
+                    'MediaTas': media_tiempos_as,
+                    'MedianaTas': mediana_tiempos_as,
+                    'ModaTas': moda_tiempos_as,
+                    'RangoTas': rango_tiempos_as,
+                    # DIFERENCIAS TAMAÑO Padre-Hijo Antecesor-Sucesor
+                    'Longitud': longitud,
+                    'Longitud media': longitud_media,
+                    'Longitud Max': max_longitudes,
+                    'Longitud Min': min_longitudes,
+                    #'MediaL': media_longitudes,
+                    #'MedianaL': mediana_longitudes,
+                    #'ModaL': moda_longitudes,
+                    #'RangoL': rango_longitudes,
+                    #'Título mensaje': titulos_mensajes,
+                    'Caracteres títulos mensajes': len(titulos_mensajes) - n_mensajes - 1,  # Espacios en blanco de separacion de los títulos
+                    #'Texto mensaje': textos_mensajes.strip(),
+                    'Caracteres texto mensajes': len(textos_mensajes) - n_mensajes - 1,  # Espacios en blanco de separacion de los textos
+                    # ANÁLISIS de TEXTO
+                    # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
+                    #    'Tokens': var_token,  # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras, 'ns': numero de stopwords}
+                    #    "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'), 'ns': var_token.get('ns'),
+                    "lc": lc, 'nt': nt, 'nf': nf, 'np': np, 'ns': ns,
+                    # .SnowballStemmer("spanish").stem,
+                    #    'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas(Cantidad de información)}
+                    #    'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
+                    'nr': nr, 'nrd': nrd,
+                    # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
+                    #    'Postag': var_pos,  # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
+                    #    'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
+                    # PoS: # 'nn': nn, 'nv': nv, 'nnd': nnd, 'nvd': nvd,
+                    'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links,
+                    'Curso': int(curso),
+                }
+            elif tipo == 'clasificador':
+                autor = {}
+            else:
+                autor = {
                     # BASE #
                     # MENSAJES #
                     'Asignatura': mensaje['Asignatura'],
@@ -1957,104 +2170,26 @@ def generar_autores(mensajes, hilos, campo, curso_asig, tipo):
                     # 'MedianaL': mediana_longitudes,
                     # 'ModaL': moda_longitudes,
                     # 'RangoL': rango_longitudes,
-                    'Títulos mensajes': titulos_mensajes,
-                    'Caracteres títulos mensajes': len(titulos_mensajes) - n_mensajes - 1,
-                # Espacios en blanco de separacion de los títulos
+                    'Título mensaje': titulos_mensajes,
+                    'Caracteres títulos mensajes': len(titulos_mensajes) - n_mensajes - 1,  # Espacios en blanco de separacion de los títulos
                     'Texto mensaje': textos_mensajes.strip(),
-                    'Caracteres texto mensajes': len(textos_mensajes) - n_mensajes - 1,
-                # Espacios en blanco de separacion de los textos
-                    # ANÁLISIS de TEXTO
+                    'Caracteres texto mensajes': len(textos_mensajes) - n_mensajes - 1,  # Espacios en blanco de separacion de los textos
                     # ANÁLISIS de TEXTO
                     # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
-                    #    'Tokens': var_token,
-                    # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras, 'ns': numero de stopwords}
-                    #    "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'),
-                    #    'ns': var_token.get('ns'),
+                    #    'Tokens': var_token,  # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras, 'ns': numero de stopwords}
+                    #    "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'), 'ns': var_token.get('ns'),
+                    "lc": lc, 'nt': nt, 'nf': nf, 'np': np, 'ns': ns,
                     # .SnowballStemmer("spanish").stem,
-                    #    'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas}
+                    #    'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas(Cantidad de información)}
                     #    'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
+                    'nr': nr, 'nrd': nrd,
                     # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
-                    #    'Postag': var_pos,
-                    # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
+                    #    'Postag': var_pos,  # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
                     #    'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
-                    #    'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links,
-                    'Curso': curso,
+                    # PoS: # 'nn': nn, 'nv': nv, 'nnd': nnd, 'nvd': nvd,
+                    'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links,
+                    'Curso': int(curso),
                 }
-            if tipo == 'cluster':
-                autor = {
-                # BASE #
-                # MENSAJES #
-                'Asignatura': int(mensaje['Asignatura']),
-                # 'Foro': mensaje['Foro'], 'Nombre foro': mensaje['Nombre foro'],
-                # 'Caracteres foro': mensaje['Caracteres foro'],
-                # 'Hilo': mensaje['Hilo'], 'Título': mensaje['Título'], 'Caracteres hilo': mensaje['Caracteres hilo'],
-                'Nº autores': n_autores,
-                'Nº foros': n_foros,
-                'Nº hilos': n_hilos,
-                'Nº mensajes': n_mensajes,
-                #'Nº auto-respuestas': n_auto_respuestas,
-                #'Nº subhilos': n_subhilos,
-                # MENSAJES x SUBHILO
-                #'Mensajes medios por subhilo': n_mensajes_medio_subhilo,
-                #'Mensaje': mensaje['Mensaje'], 'Responde a': mensaje['Responde a'],
-                #'Remitente': id_autor, 'Autor': id_autor,
-                # TIPO INICIAL, TERMINAL, RESPUESTA Y AUTO-RESPUESTA
-                'Iniciales': n_iniciales, 'Respuestas': n_respuestas,
-                'Auto-respuestas': n_auto_respuestas, 'Terminales': n_terminales,
-                # DISTANCIAS Padre-Hijo Antecesor-Sucesor
-                #    'Día': dia_semana, 'Fecha': fecha, 'Hora': hora,
-                'Date': abs(datetime.strptime(date, "%d/%m/%Y %H:%M:%S") - datetime.strptime('01/01/2010 00:00:00', "%d/%m/%Y %H:%M:%S")).total_seconds(),
-                # DISTANCIA y DISTANCIA MEDIA #
-                'Distancia': distancia,
-                'Distancia / Mensajes': distancia_media,
-                'Distancia Max': max_tiempos,
-                'Distancia Min': min_tiempos,
-                #    'Distancia PH': date_ph
-                'Distancia MaxTph': max_tiempos_ph,
-                'Distancia MinTph': min_tiempos_ph,
-                'MediaTph': media_tiempos_ph,
-                'MedianaTph': mediana_tiempos_ph,
-                'ModaTph': moda_tiempos_ph,
-                'RangoTph': rango_tiempos_ph,
-                #    'Distancia AS': date_as,
-                'Distancia MaxTas': max_tiempos_as,
-                'Distancia MinTs': min_tiempos_as,
-                'MediaTas': media_tiempos_as,
-                'MedianaTas': mediana_tiempos_as,
-                'ModaTas': moda_tiempos_as,
-                'RangoTas': rango_tiempos_as,
-                # DIFERENCIAS TAMAÑO Padre-Hijo Antecesor-Sucesor
-                'Longitud': longitud,
-                'Longitud media': longitud_media,
-                'Longitud Max': max_longitudes,
-                'Longitud Min': min_longitudes,
-                #'MediaL': media_longitudes,
-                #'MedianaL': mediana_longitudes,
-                #'ModaL': moda_longitudes,
-                #'RangoL': rango_longitudes,
-                #'Títulos mensajes': titulos_mensajes,
-                'Caracteres títulos mensajes': len(titulos_mensajes) - n_mensajes - 1,  # Espacios en blanco de separacion de los títulos
-                #'Texto mensaje': textos_mensajes.strip(),
-                'Caracteres texto mensajes': len(textos_mensajes) - n_mensajes - 1,  # Espacios en blanco de separacion de los textos
-                # ANÁLISIS de TEXTO
-                # ANÁLISIS de TEXTO
-                # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
-                #    'Tokens': var_token,
-                # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras, 'ns': numero de stopwords}
-                "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'),
-                'ns': var_token.get('ns'),
-                # .SnowballStemmer("spanish").stem,
-                #    'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas}
-                'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
-                # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
-                #    'Postag': var_pos,
-                # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
-                #    'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
-                #    'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links,
-                'Curso': int(curso),
-                }
-            elif tipo == 'clasificador':
-                autor = {}
 
             # PRIMER MENSAJE AUTOR #
             # INICIALIZAR MENSAJES #
@@ -2166,7 +2301,25 @@ def generar_autores(mensajes, hilos, campo, curso_asig, tipo):
                 longitudes_previas.append(la_longitud)
                 # Array de índices de longitudes
                 contador_longitudes_previas.insert(longitudes_previas.index(la_longitud), 1)
-
+            #
+            # ACUMULADOS ANÁLISIS TEXTO
+            lc = 0
+            nt = 0
+            nf = 0
+            np = 0
+            ns = 0
+            nr = 0
+            nrd = 0
+            nn = 0
+            nnd = 0
+            nv = 0
+            nvd = 0
+            # ACUMULADOS ADJUNTOS
+            n_adjs = 0
+            t_adj = 0
+            n_emojis = 0
+            n_links = 0
+            #
             # TEXTOS
             titulos_mensajes = mensaje['Título mensaje']
             textos_mensajes = mensaje['Texto mensaje']
@@ -2230,7 +2383,7 @@ def generar_foros(mensajes, hilos, autores, campo, curso_asig, tipo):
     #
 
     # Variables Globales
-    foto = {}
+    foro = {}
     # Interruptores
     foro_previo = 0
 
@@ -2244,7 +2397,7 @@ def generar_foros(mensajes, hilos, autores, campo, curso_asig, tipo):
             foro_previo = mensaje['Foro']
 
     ########################
-    # Derfinición de ASIGNATURA
+    # Derfinición de FORO
     ########################
     # asignatura=[tit_hilo, id_hilo, id_mensaje, id_ref_mensaje, id_autor, autor, dia_semana, fecha, tit_mensaje, texto]
     if tipo == 'excel':
@@ -2252,6 +2405,8 @@ def generar_foros(mensajes, hilos, autores, campo, curso_asig, tipo):
     elif tipo == 'cluster':
         foro = {}
     elif tipo == 'clasificador':
+        foro = {}
+    else:
         foro = {}
 
     foros.append(foro)
@@ -2294,8 +2449,9 @@ def generar_asignaturas(mensajes, hilos, autores, foros, campo, curso_asig, tipo
         asignatura = {}
     elif tipo == 'clasificador':
         asignatura = {}
+    else:
+        asignatura = {}
 
     asignaturas.append(asignatura)
-
 
     return asignaturas
