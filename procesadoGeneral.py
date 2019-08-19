@@ -164,7 +164,6 @@ class Clustering(object):
 # Objeto
 msg = Mensaje(mensaje1)
 msg.asignarmensaje(mensaje1)
-print('AAAAAAAAAAAAAAAAAAAAAA', mensaje1)
 
 # DIRECTORIO ANOTADORES #
 ########################
@@ -309,12 +308,12 @@ def enraizado(pal=lista_palabras):
 def postag_EN():
 
     print('#######')
-    print('TAGGING A/B/C')
+    print('POSTAGGING A/B/C')
     print('#######')
 
     # A
     # English Palabras
-    print('TAGGING A lang="en"')
+    print('POSTAGGING A lang="en"')
     print('Palabras')
     print('#######')
     pos = nltk.pos_tag(palabras)
@@ -324,7 +323,7 @@ def postag_EN():
 
     # B
     # English Sentencias
-    print('TAGGING B lang="en"')
+    print('POSTAGGING B lang="en"')
     print('Sentencias')
     print('#######')
     lista_tags = []
@@ -344,7 +343,7 @@ def postag(msj=mensaje):
     # C
     # Spanish Mensaje
     print('#######')
-    print('TAGGING C lang="es"')
+    print('POSTAGGING C lang="es"')
     print('#######')
 
     lista_tags = []
@@ -398,7 +397,7 @@ def postag(msj=mensaje):
 ###########################
 # CLASIFICACIONES Y CULSTER
 ###########################
-# CULSTER
+# CULSTERING
 ########################
 def cluster(ins=instancias):
     from nltk.cluster import em
@@ -498,6 +497,7 @@ def cluster(ins=instancias):
     print()
 
     return 0
+
 
 # CLASIFICACIONES
 ########################
@@ -700,7 +700,7 @@ def sentimiento():
     sentence = sentence_ES_N
 
     # C Spanish
-    print('TAGGING C lang="es"')
+    print('POSTAGGING C lang="es"')
     print('#######')
 
     # Lectura desde ficheros
