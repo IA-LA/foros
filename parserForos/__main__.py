@@ -198,11 +198,14 @@ if __name__ == '__main__':
     ###########################################
     # GLOBAL
     ###########################################
-    print('GLOBAL M', lista_de_mensajes_global)
+    print('GLOBAL MENSJAES')
+    #print('GLOBAL M', lista_de_mensajes_global)
     print()
-    print('GLOBAL H', lista_de_hilos_global)
+    print('GLOBAL HIKOS')
+    #print('GLOBAL H', lista_de_hilos_global)
     print()
-    print('GLOBAL A', lista_de_autores_global)
+    print('GLOBAL AUTORES')
+    #print('GLOBAL A', lista_de_autores_global)
 
     # # JSON WEKA GLOBAL
     # (acumulado autores) # #
