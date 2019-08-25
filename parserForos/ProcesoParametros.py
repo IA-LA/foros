@@ -65,7 +65,7 @@ def filtrar_parametros(parametros):
 
         return [{'tipo': n, 'ruta': ruta, 'rutaynombre': rutaynombre,
                  'rutaynombreyextensionTxt': rutaynombreyextensionTxt,
-                 'id_asignatura': id_asignatura, 'abreviatura': None, 'ano': None}]
+                 'id_asignatura': id_asignatura, 'abreviatura': None, 'ano': '1900'}]
 
     # 1 parámetro
     elif n == 2:
@@ -87,7 +87,10 @@ def filtrar_parametros(parametros):
         if len(nombre) > 1:
             abrv = nombre[1]
             id_asig = nombre[2]
-            curso = nombre[3]
+            if len(nombre) > 3:
+                curso = nombre[3]
+            else:
+                curso = '1900'
 
             #print(nombre, abrv, id_asig, curso)
             ficheros.append({'tipo': n, 'ruta': ruta, 'rutaynombre': rutaynombre,
@@ -135,7 +138,10 @@ def filtrar_parametros(parametros):
                 if len(nombre) > 1 and extension == '.txt' and len(fichero_utf8) == 1:
                     abrv = nombre[1]
                     id_asig = nombre[2]
-                    curso = nombre[3]
+                    if len(nombre) > 3:
+                        curso = nombre[3]
+                    else:
+                        curso = '1900'
 
                     ficheros.append({'tipo': n, 'ruta': ruta, 'rutaynombre': rutaynombre,
                                      'rutaynombreyextensionTxt': rutaynombreyextensionTxt,

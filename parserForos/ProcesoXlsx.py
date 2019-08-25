@@ -8,6 +8,7 @@ Generación de vistas temporales del csv importado
 @author: FJSB
 
 Anonimizado de vistas temporales del csv importado
+leer_excel
 """
 
 
@@ -46,6 +47,7 @@ def escribir_csv(df, nombre_archivo):
 def escribir_excel(df, nombre_archivo, nombre_hoja):
     print(nombre_archivo, nombre_hoja)
     excel = nombre_archivo + ".xlsx"
+    # Si no exite el fichero
     if not os.path.isfile(excel):
         # # Anonimizado (escribir_excel)
         # Autor anónimo
@@ -64,6 +66,21 @@ def escribir_excel(df, nombre_archivo, nombre_hoja):
         with pd.ExcelWriter(excel, datetime_format='DD/MM/YYYY', date_format='DD/MM/YYYY', time_format='HH:MM:SS', mode='a') as writer:
             df.to_excel(writer, sheet_name=nombre_hoja, engine='xlsxwriter')
     print('Fichero Excel creado: ', excel)
+
+
+def leer_excel(nombre_archivo, nombre_hoja):
+    print(nombre_archivo, nombre_hoja)
+    excel = nombre_archivo + ".xlsx"
+
+    # Data Frame Pandas de hoja Excel
+    xl = pd.ExcelFile(excel)
+    df_xl = pd.read_excel(excel, sheet_name=nombre_hoja)
+    #print(xl, df_xl)
+    #print(xl.sheet_names)
+    df = xl.parse(nombre_hoja)
+    #print(df.head(), df_xl.head())
+
+    return df
 
 
 def distribucion_temporal_dias_semana(input_file, export_file):

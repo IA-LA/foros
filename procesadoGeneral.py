@@ -192,7 +192,7 @@ spanish_postagger = StanfordPOSTagger(os.path.join(dir_path, 'standford/models/s
 
 # TOKEN
 ########################
-def tokenizado(msj=mensaje):
+def tokenizado(msj=mensaje, nombres=''):
     global tokens
     global sentencias
     global palabras
@@ -208,10 +208,74 @@ def tokenizado(msj=mensaje):
     lista_tokens = []
     lista_palabras = []
 
-    print('#######')
-    print('TOKENS')
-    print('#######')
+    from nltk.tokenize import TreebankWordTokenizer
+
+    tokenizer = TreebankWordTokenizer()
+
+    #print('#######')
+    #print('ESPACIAR TEXTO CON PUNTO, PUNTO Y COMA O DOS PUNTOS, ... ETC.')
+    #print('#######')
+    import re
+
+    #msj = re.sub(r'\.', ' . ', msj)
+    msj = re.sub(r'(\W)([.;:¿"*])(\w)', '\\1 \\2 \\3', msj)
+
+    #print('#######')
+    #print('TOKENS')
+    #print('#######')
     lista_tokens = word_tokenize(msj)
+    #lista_tokens2 = tokenizer.tokenize(msj)
+
+    #print('#######')
+    #print('DIVIDIR TOKENS ???????????????????????????????????')
+    #print('#######')
+    #lista_tokens = [token.split('.') for token in lista_tokens]
+    #lista_tokens = [token[:token.index('.')] if '.' in token else token for token in lista_tokens]
+    #lista_tokens = [token.split('.')[0] + ' . ' + token.split('.')[1] if '.' in token else token for token in lista_tokens]
+
+    # REVISAR
+    #print('ELIMINAR NOMBRES APELLIDOS ANTECESOR AUTOR PADRE')
+    #print('#######')
+
+    if nombres != '':
+        # Extrae la lista de los nombres
+        nombres = nombres.split(' ')
+        #print("NOMBREEEEEEEE:", nombres)
+
+        # Quitar artículos
+        # ¿¿¿¿¿¿¿¿¿¿¿¿¿ Quitar stopwords ????????????? : if nombre in  stop_words
+        lista_nombres = set(['' if len(nombre) < 3 else nombre for nombre in nombres])
+        # Quitar Tildes Castellano, Catalán, Más tildes: ( ´ ` ) ^ ¨ ???
+        lista_nombres = [nombre.replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace('Á', 'A').replace('É', 'E').replace('Í', 'I').replace('Ó', 'O').replace('Ú', 'U').replace('à', 'a').replace('é', 'e').replace('ì', 'i').replace('ò', 'o').replace('ù', 'u').replace('À', 'A').replace('È', 'E').replace('Ì', 'I').replace('Ò', 'O').replace('Ù', 'U') for nombre in lista_nombres]
+        lista_tokens = [token.replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace('Á', 'A').replace('É', 'E').replace('Í', 'I').replace('Ó', 'O').replace('Ú', 'U').replace('à', 'a').replace('é', 'e').replace('ì', 'i').replace('ò', 'o').replace('ù', 'u').replace('À', 'A').replace('È', 'E').replace('Ì', 'I').replace('Ò', 'O').replace('Ù', 'U') for token in lista_tokens]
+
+        lista_tokens = ['ANONIMO' if token in lista_nombres else token for token in lista_tokens]
+
+        # Distancia Levenshtein       |    Distancia Jaccard
+        # ---------------------       |    -----------------
+        # nltk.edit_distance(w1, w2)  |    nltk.jaccard_distance(set(w1), set(w2))
+        for nombre in lista_nombres:
+            lista_tokens = ['ANONIMO' if (
+                    (nltk.edit_distance(token, nombre) <= 1 and nltk.jaccard_distance(set(token), set(nombre)) <= 0.2)
+                    and len(token) > 3) else token for token in lista_tokens]
+        #lista_tokens = ['ANONIMO' if (
+        #        (nltk.edit_distance(token, lista_nombres[1]) <= 1 and nltk.jaccard_distance(set(token), set(lista_nombres[1])) <= 0.2)
+        #        and len(token) > 3) else token for token in lista_tokens]
+        #lista_tokens = ['ANONIMO' if (
+        #        ((nltk.edit_distance(token, nombre) <= 1 and nltk.jaccard_distance(set(token), set(nombre)) <= 0.2) for nombre in lista_nombres)
+        #        and len(token) > 3) else token for token in lista_tokens]
+
+        #lista_tokens = ['ANONIMO' if procesadoMensaje.distancia_combinada(token, lista_nombres[1]) <= 1.5 else token for token in lista_tokens]
+        #lista_tokens = ['ANONIMO' if nltk.jaccard_distance(set(token), set(lista_nombres[1])) <= 0.2 else token for token in lista_tokens]
+        #lista_tokens = ['ANONIMO' if (nltk.edit_distance(token, lista_nombres[1]) == 1 and len(nombre) == len(lista_nombres[1]) and nltk.jaccard_distance(set(token), set(lista_nombres[1])) < 0.5) else token for token in lista_tokens]
+
+        #print("NOMBREEEEEEEE:", lista_nombres)
+
+    # REVISAR
+    #print('MINUSCULAS')
+    #print('#######')
+    lista_tokens = [token.lower() for token in lista_tokens]
+
     # GLOBAL
     # Array de tokens
     tokens.append(lista_tokens)
@@ -234,8 +298,8 @@ def tokenizado(msj=mensaje):
     #print('TOKENS', lista_tokens)
 
     # STOPWRODS
-    print('STOPWRODS lang="es"')
-    print('#######')
+    #print('STOPWRODS lang="es"')
+    #print('#######')
     stop_words = stopwords.words('spanish')
 
     # Añadir signos de puntuación
@@ -270,7 +334,10 @@ def tokenizado(msj=mensaje):
     #print('STOPWORDS', stop_words)
     #print('PALABRAS', lista_palabras)
 
-    return {"c": msj, "lc": longitud_caracteres, 't': lista_tokens, 'nt': numero_tokens, 'f': sentencias, 'nf': numero_frases, 'p': lista_palabras, 'np': numero_palabras, 'ns': numero_stop_words}
+    #print(lista_tokens)
+
+    return {"c": msj, "lc": longitud_caracteres, 't': lista_tokens, 'nt': numero_tokens, 'f': sentencias,
+            'nf': numero_frases, 'p': lista_palabras, 'np': numero_palabras, 'ns': numero_stop_words}
 
 
 # RAIZ
@@ -279,9 +346,9 @@ def enraizado(pal=lista_palabras):
     global raices
     global lista_raices
 
-    print('#######')
-    print('RAICES lang="es"')
-    print('#######')
+    #print('#######')
+    #print('RAICES lang="es"')
+    #print('#######')
 
     # Extrae raices
     lista_raices = []
@@ -347,14 +414,27 @@ def postag(msj=mensaje):
     print('#######')
 
     lista_tags = []
+
+    # tokenizado()
     # Si no se ha llamado tokenizado() previamente
+    print('#######')
+    print('DIVIDIR TOKENS CON PUNTO, PUNTO Y COMA O DOS PUNTOS, ... ETC.')
+    print('#######')
+    import re
+
+    msj = re.sub(r'(\W)([.;:¿"*])(\w)', '\\1 \\2 \\3', msj)
+
+    # Minúsculas
+    #for sentencia in sent_tokenize(msj.lower()):
     for sentencia in sent_tokenize(msj):
+        # X token
         tag = spanish_postagger.tag(word_tokenize(sentencia))
+        # X frase
         # tag = spanish_postagger.tag_sents(sentencia)
         tags.append(tag)
         lista_tags = lista_tags + tag
 
-    # PoS TAG RAICES (no funciona demasiado bien, confunde verbos y nombrea)
+    # PoS TAG RAICES (no funciona demasiado bien, mezcla y confunde verbos y nombrea)
     # lista_tags = spanish_postagger.tag(lista_raices)
 
     print('POSTAG', lista_tags)
@@ -391,7 +471,8 @@ def postag(msj=mensaje):
     print('NOMBRES', nombres, nombres_distintos)
     print('VERBOS', verbos, verbos_distintos)
 
-    return {'n': nombres, 'nn': numero_nombres, 'v': verbos, 'nv': numero_verbos, 'nd': nombres_distintos, 'nnd': numero_nombres_distintos, 'vd': verbos_distintos, 'nvd': numero_verbos_distintos}
+    return {'n': nombres, 'nn': numero_nombres, 'v': verbos, 'nv': numero_verbos, 'nd': nombres_distintos,
+            'nnd': numero_nombres_distintos, 'vd': verbos_distintos, 'nvd': numero_verbos_distintos}
 
 
 ###########################
@@ -735,7 +816,7 @@ def sentimiento():
         classResult2_ES = classifier2_ES.classify(procesadoMensaje.word_feats(word.lower()))
         classResult3_ES = classifier3_ES.classify(procesadoMensaje.word_feats(word.lower()))
 
-        classResult_ES = procesadoMensaje.ponderarClasificación([classResult1_ES, classResult2_ES, classResult3_ES])
+        classResult_ES = procesadoMensaje.ponderarClasificacion([classResult1_ES, classResult2_ES, classResult3_ES])
 
         if ((word.lower() not in stopWords) and (word.lower() not in nombres[0])) or (word.lower() in 'no') or (
                 word.lower() in 'sí'):
