@@ -2,8 +2,8 @@ FOROS 2017-18
 -------------
 |    ID    |                        FICHERO                         |                       ASIGNATURA                 | PLAN DE ESTUDIOS |
 | ---------|--------------------------------------------------------|--------------------------------------------------|------------------|
-| 71901037 | Foros_jlfv_2018-19.txt                                 | Lógica y Estructuras Discretas                   | Informática      |
-| 71013130 | Foros_Alvaro_2017-18.txt                               | Procesadores del Lenguaje I                      | Informática      |
+| 71901037 | Foros_led_2018-19.txt                                  | Lógica y Estructuras Discretas                   | Informática      |
+| 71013130 | Foros_pl1_2017-18.txt                                  | Procesadores del Lenguaje I                      | Informática      |
 |          |                                                        |                                                  |                  |
 | 6390103- | Foros_educacion_2018-19.txt                            | Sociedad del Conocimiento, Tecnología y Educación| Educación        |
 |          |                                                        |                                                  |                  |
