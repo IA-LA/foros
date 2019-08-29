@@ -670,13 +670,21 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo, clase=''):
                     hora = fecha_parser[4]
 
                     #######################
-                    # Tratamiento AMPLIADO de TEXTO
+                    # Tratamiento AMPLIADO de TEXTO \[(data|link|twitgram|anonimo|movil|email)\]
                     #######################
+
+                    #
+                    # HTML ENTITY
+                    #
+                    # Busca entidades y los sustituye por el carácter equivalente
+                    import html as html
+
+                    #texto = html.unescape('Hola, cuando se concrete la fecha para &#39;APP-III&#39;, me dices, por mi parte, si me avisas con tiempo mejor&iexcl;&iexcl;  Saludos&iexcl;&iexcl;')
+                    texto = html.unescape(texto)
 
                     #
                     # ADJUNTOS (DOCUMENTOS, IMAGENES o EMOTICONOS)
                     #
-
                     import re
 
                     def tratamiento(item):
@@ -711,12 +719,12 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo, clase=''):
                         regex = re.search(r'(\[IMAGE: .*\])', texto, re.M | re.I)
                         if regex != None:
                             # Reemplaza todos los ADJUNTOS Y EMOJIS [IMAGE:] por [DATA] Ampliación: poner tipo [DATA:XXX]
-                            texto = re.sub(r'(\[IMAGE: .*\])', '[DATA]', texto)
+                            texto = re.sub(r'(\[IMAGE: .*\])', ' [DATA] ', texto)
                             # print(regex.group(1))
                             # print(texto)
                             # exit(12345567890)
 
-                    # Busca LINKS (eliminados ADJUNTOS y EMOJIS)
+                    # Busca LINKS (ya eliminados ADJUNTOS y EMOJIS)
                     if texto.find('http') != -1:
                         # Todos los http
                         n_links = len(re.findall(r'(http)', texto, re.M | re.I))
@@ -726,16 +734,151 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo, clase=''):
                     n_links_r = len(re.findall(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''', texto, re.M | re.I))
                     if n_links_r != 0:
                         # Reemplaza todos los LINKS (http) (sin ADJUNTOS y EMOJIS)
-                        texto = re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''', '[LINK]', texto)
+                        texto = re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''', ' [LINK] ', texto)
                         #print('LINKS REEMPLAZADOS: ', n_links_r, texto)
 
-                    # Busca e-mails y los reemplaza por [EMAIL]
+                    # Cuenta ARROBAS, HASHTAG Y MOVILES
+                    n_arrobas = 0
+                    n_emails_r = 0
+                    n_twiters_r = 0
+                    n_hashtags = 0
+                    n_hashtagr_r = 0
+                    n_moviles = 0
+                    n_moviles_r = 0
+                    n_abrev = 0
+                    n_abrev_r = 0
+
+                    # Busca ARROBAS y los reemplaza por [EMAIL] o [TWITGRAM]
+                    if texto.find('@') != -1:
+                        # Todos los email, twitter o telegram id
+                        n_arrobas = len(re.findall(r'(@)', texto, re.M | re.I))
+                        # print('ARROBAS ENCONTRADAS: ', n_arrobas)
+                    # Busca EMAILS y los reemplaza por [EMAIL]
+                    n_emails_r = len(re.findall(r'([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)', texto, re.M | re.I))
+                    if n_emails_r != 0:
+                        # Reemplaza todos los EMAILS (a@a.a) (sin LINKS, ADJUNTOS y EMOJIS)
+                        texto = re.sub(r'([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)', ' [EMAIL] ', texto)
+                        #print('EMAILS REEMPLAZADOS: ', n_emails_r, texto)
+                    # Busca TWITTER/TELEGRAM ID (@a) y los reemplaza por [                                                                                                                                                                                                                                                                                                ]
+                    n_twitters_r = len(re.findall(r'(^|[^@\w])@(\w{1,15})\b', texto, re.M | re.I))
+                    if n_twitters_r != 0:
+                        # Reemplaza todos los TWITTER/TELEGRAMS ID (@a) (sin EMAILS, LINKS, ADJUNTOS y EMOJIS)
+                        texto = re.sub(r'(^|[^@\w])@(\w{1,15})\b', ' [TWITGRAM] ', texto)
+                        #print('TWITTER/TELEGRAM ID REEMPLAZADOS: ', n_twitters_r, texto)
+
+                    # Busca HASHTAGS (#) y los reemplaza por ' [HASHTAG] '
+                    # r'#(\w+)'
+                    if texto.find('#') != -1:
+                        # Todos los hashtags
+                        n_hashtags = len(re.findall(r'(#)', texto, re.M | re.I))
+                        # print('HASHTAGS ENCONTRADAS: ', n_hashtags)
+                    # Busca HASHTAGS ID y los reemplaza por [HASHTAG]
+                    n_hashtags_r = len(re.findall(r'(^|[^#\w])#(\w{1,15})\b', texto, re.M | re.I))
+                    if n_hashtags_r != 0:
+                        # Reemplaza todos los HASHTAGS (#a) (sin TWITTER/TELEGRAMS, EMAILS, LINKS, ADJUNTOS y EMOJIS)
+                        texto = re.sub(r'(^|[^#\w])#(\w{1,15})\b', ' [HASHTAG] ', texto)
+                        #print('HASHTAGS REEMPLAZADOS: ', n_hashtags_r, texto)
+
+                    # Busca NUMEROS DE MOVIL y los reemplaza por ' [MOVIL] ' DE LOS GRUPOS DE TELEGRAM/WHATSAPP
+                    # r'(\+34|0034|34)?[ -.]*(6|7)[ -.]*([0-9][ -.]*){8}'
+                    if texto.find('6') != -1 or texto.find('7') != -1:
+                        # Todos los móviles
+                        n_moviles = len(re.findall(r'(\+34|0034|34)?[ -.]*(6|7)[ -.]*([0-9][ -.]*){8}', texto, re.M | re.I))
+                        # print('MOVILES ENCONTRADOS: ', n_moviles)
+                    # Busca MOVILES y los reemplaza por [MOVIL]
+                    n_moviles_r = len(re.findall(r'(\+34|0034|34)?[ -.]*(6|7)[ -.]*([0-9][ -.]*){8}', texto, re.M | re.I))
+                    if n_moviles_r != 0:
+                        # Reemplaza todos los MOVILES (#a) (sin HASHTAGS, TWITTER/TELEGRAMS, EMAILS, LINKS, ADJUNTOS y EMOJIS)
+                        texto = re.sub(r'(\+34|0034|34)?[ -.]*(6|7)[ -.]*([0-9][ -.]*){8}', ' [MOVIL] ', texto)
+                        #print('MOVILES REEMPLAZADOS: ', n_moviles_r, texto)
 
                     #
-                    # NOMBRES
+                    # ABREVIATURAS DE NOMBRES
                     #
-                    # Busca nombres y los sustituye por '[ANONIMO]'
+                    # Busca nombres y los sustituye por ' [ANONIMO] '
 
+                    # Busca Abreviaturas Nombres Mª, Mª., M.ª, Fco, Fco.
+                    #                    Apellidos Gª, Gª., G.ª
+                    #  y los reemplaza por ' ANONIMO ' ' Maria ' ' Francisco ' ' Garcia '
+                    if texto.find('Mª') != -1 or texto.find('Mª.') != -1 or texto.find('M.ª') != -1 or texto.find('Gª') != -1 or texto.find('Gª.') != -1 or texto.find('G.ª') != -1:
+                        # or texto.find('Fco') != -1 or texto.find('Fco.') != -1 or texto.find('Fco') != -1:
+                        # Todas las abreviaturas
+                        n_abrev = len(re.findall(r'(M|m|G|g)[ .]*ª[ .]*', texto, re.M | re.I))
+                        #print('ABREVIATURAS ENCONTRADAS: ', n_abrev)
+                    # Busca ABREVIATURAS y las reemplaza por ' [ANONIMO] '
+                    n_abrev_r = len(re.findall(r'(M|m|G|g)[ .]*ª[ .]*', texto, re.M | re.I))
+                    if n_abrev_r != 0:
+                        # Reemplaza todos las ABREVIATURAS
+                        texto = re.sub(r'(M|m|G|g)[ .]*ª[ .]*', ' [ANONIMO] ', texto)
+                        #print('ABREVIATURAS REEMPLAZADAS: ', n_abrev_r, texto)
+
+                    #######################
+                    # FIN Tratamiento AMPLIADO de TEXTO \[(data|link|twitgram|anonimo|movil|email)\]
+                    #######################
+
+                    ###################
+                    # ANÁLISIS de TEXTO x MENSAJE
+                    ###################
+                    from procesadoGeneral import tokenizado
+                    from procesadoGeneral import enraizado
+                    from procesadoGeneral import postag
+                    from procesadoGeneral import cluster
+
+                    #
+                    # ANÁLISIS del TEXTO MENSAJE
+                    #
+                    print('TOKENIZADO MENSAJE')
+                    #print('TOKENIZADO MENSAJE(', len(mensajes), ') ASIG(', id_asig, ') TIPO(', tipo, '): ', nombre_antecesor + ' ' + nombre_sucesor + ' ' + nombre_padre)
+                    var_token = tokenizado(texto.strip(), nombre_antecesor + ' ' + nombre_sucesor + ' ' + nombre_padre)
+                    #print('TOKENIZADO MENSAJE(', len(mensajes), '). ')
+                    #print('TOKENIZADO MENSAJE')
+                    #print('TOKENIZADO MENSAJE(', n_mensajes_hilo, '): ', var_token)
+
+                    #print('RAICES MENSAJE')
+                    print('RAICES MENSAJE(', len(mensajes), ') ASIG(', id_asig, ') TIPO(', tipo, '): ')
+                    var_raiz = enraizado()
+                    #print('RAICES MENSAJE(', len(mensajes), '). ')
+                    #print('RAICES MENSAJE')
+                    #print('RAICES MENSAJE(', var_token, '): ', var_raiz)
+
+                    #print('POSTAG MENSAJE')
+                    # print('POSTAG MENSAJE(', len(mensajes), ') ASIG(', id_asig, ') TIPO(', tipo, '): ')
+                    #var_pos = postag(texto.strip())
+                    #print('POSTAG MENSAJE(', len(mensajes), '). ')
+                    #print('POSTAG MENSAJE')
+                    #print('POSTAG MENSAJE(', len(mensajes), '): ', var_pos)
+
+                    #print('CLUSTER MENSAJE')
+                    # print('CLUSTER MENSAJE(', len(mensajes), ') ASIG(', id_asig, ') TIPO(', tipo, '): ')
+                    #var_clu = cluster()
+                    #print('CLUSTER MENSAJE')
+                    #print('CLUSTER MENSAJE: ', var_clu)
+
+                    # exit(999)
+
+                    #
+                    # ANÁLISIS del TITULO DEL TEXTO ????????????????????????????????????????????????????????????????????
+                    #
+
+                    # exit(999)
+
+                    #
+                    # TOPIC MODELLING, t-SNE, Spectral Clusterin de un MENASJE ?????????????????????????????????????????
+                    #
+
+                    # exit(999)
+
+                    #
+                    # CLUSTERING de MENASJE
+                    #
+                    #var_clu = cluster()
+                    #print('CLUSTER MENSAJE: ', var_clu)
+
+                    # exit(999)
+
+                    #
+                    # POSICIONES EN HILO
+                    #
                     # INICIAL
                     if id_ref_mensaje == '':
 
@@ -754,7 +897,6 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo, clase=''):
                         # Antecesor-Sucesor
                         nombre_antecesor = nombre_sucesor
                         nombre_sucesor = autor
-
 
                     #
                     # DIFERENCIAS (len(nombre_foro) + len(tit_hilo) + len(tit_mensaje) + len(texto))
@@ -892,67 +1034,7 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo, clase=''):
                         # TERMINAL
                         terminal = 0  # 'posible'
 
-                    ###################
-                    # ANÁLISIS de TEXTO x MENSAJE
-                    ###################
-                    from procesadoGeneral import tokenizado
-                    from procesadoGeneral import enraizado
-                    from procesadoGeneral import postag
-                    from procesadoGeneral import cluster
-
-                    #
-                    # ANÁLISIS del TEXTO MENSAJE
-                    #
-                    print('TOKENIZADO MENSAJE')
-                    # print('TOKENIZADO MENSAJE(', len(mensajes), ') ASIG(', id_asig, ') TIPO(', tipo, '): ')
-                    var_token = tokenizado(texto.strip(), nombre_antecesor + ' ' + nombre_sucesor + ' ' + nombre_padre)
-                    #print('TOKENIZADO MENSAJE(', len(mensajes), '). ')
-                    #print('TOKENIZADO MENSAJE')
-                    #print('TOKENIZADO MENSAJE(', n_mensajes_hilo, '): ', var_token)
-
-                    #print('RAICES MENSAJE')
-                    print('RAICES MENSAJE(', len(mensajes), ') ASIG(', id_asig, ') TIPO(', tipo, '): ')
-                    var_raiz = enraizado()
-                    #print('RAICES MENSAJE(', len(mensajes), '). ')
-                    #print('RAICES MENSAJE')
-                    #print('RAICES MENSAJE(', var_token, '): ', var_raiz)
-
-                    #print('POSTAG MENSAJE')
-                    # print('POSTAG MENSAJE(', len(mensajes), ') ASIG(', id_asig, ') TIPO(', tipo, '): ')
-                    #var_pos = postag(texto.strip())
-                    #print('POSTAG MENSAJE(', len(mensajes), '). ')
-                    #print('POSTAG MENSAJE')
-                    #print('POSTAG MENSAJE(', len(mensajes), '): ', var_pos)
-
-                    #print('CLUSTER MENSAJE')
-                    # print('CLUSTER MENSAJE(', len(mensajes), ') ASIG(', id_asig, ') TIPO(', tipo, '): ')
-                    #var_clu = cluster()
-                    #print('CLUSTER MENSAJE')
-                    #print('CLUSTER MENSAJE: ', var_clu)
-
-                    # exit(999)
-
-                    #
-                    # ANÁLISIS del TITULO DEL TEXTO ????????????????????????????????????????????????????????????????????
-                    #
-
-                    # exit(999)
-
-                    #
-                    # TOPIC MODELLING, t-SNE, Spectral Clusterin de un MENASJE ?????????????????????????????????????????
-                    #
-
-                    # exit(999)
-
-                    #
-                    # CLUSTERING de MENASJE
-                    #
-                    #var_clu = cluster()
-                    #print('CLUSTER MENSAJE: ', var_clu)
-
-                    # exit(999)
-
-                    print()
+                    #print()
 
                     # Actualización Nº Mensajes RESPUESTA del Hilo
                     n_mensajes_hilo = n_mensajes_hilo + 1
@@ -1047,7 +1129,7 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo, clase=''):
                             'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links,
                             'Curso': int(curso),
                         }
-                    else:
+                    else:  # General
                         mensaje = {
                             # BASE #
                             'Asignatura': int(id_asig),
@@ -1746,7 +1828,7 @@ def generar_hilos(mensajes, campo, curso_asig, tipo, clase=''):
                     'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links,
                     'Curso': int(curso),
                 }
-            else:
+            else:  # General
                 hilo = {
                     # BASE #
                     # MENSAJES #
@@ -2035,8 +2117,7 @@ def generar_hilos(mensajes, campo, curso_asig, tipo, clase=''):
             'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links,
             'Curso': int(curso),
         }
-    else:
-        print(mensaje)
+    else:  # General
         hilo = {
             # BASE #
             # MENSAJES #
@@ -2444,7 +2525,7 @@ def generar_autores(mensajes, hilos, campo, curso_asig, tipo, clase=''):
                     if isinstance(clase[index], str): #numpy.isnan(clase[len(mensajes)]):
                         clase_hilo = clase[index]
                     autor = {}
-                else:
+                else:  # General
                     autor = {
                         # BASE #
                         # MENSAJES #
@@ -2931,7 +3012,7 @@ def generar_autores(mensajes, hilos, campo, curso_asig, tipo, clase=''):
         if isinstance(clase[index], str):  # numpy.isnan(clase[len(mensajes)]):
             clase_hilo = clase[index]
         autor = {}
-    else:
+    else:  # General
         autor = {
             # BASE #
             # MENSAJES #
