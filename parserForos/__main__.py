@@ -72,6 +72,7 @@ if __name__ == '__main__':
 
         # # JSON WEKA
         # lista_de_mensajes = generar_mensajes_base(rutaynombreUtf8, id_asignatura)
+        lista_de_mensajes_anonimos = generar_mensajes_anonimo(rutaynombreUtf8, fichero.id_asignatura, fichero.ano, '')
         lista_de_mensajes = generar_mensajes_ampliado(rutaynombreUtf8, fichero.id_asignatura, fichero.ano, '')
         lista_de_hilos = generar_hilos(lista_de_mensajes, 'Hilo', fichero.ano, '')
         lista_de_autores = generar_autores(lista_de_mensajes, lista_de_hilos, 'Remitente', fichero.ano, '')
@@ -87,14 +88,14 @@ if __name__ == '__main__':
 
         # # JSON WEKA CLUSTER
         # (sin Títulos ni Textos) # #
-        lista_de_mensajes_cluster = generar_mensajes_ampliado(rutaynombreUtf8, fichero.id_asignatura, fichero.ano, 'cluster')
-        lista_de_hilos_cluster = generar_hilos(lista_de_mensajes, 'Hilo', fichero.ano, 'cluster')
-        lista_de_autores_cluster = generar_autores(lista_de_mensajes, lista_de_hilos, 'Remitente', fichero.ano, 'cluster')
+        #lista_de_mensajes_cluster = generar_mensajes_ampliado(rutaynombreUtf8, fichero.id_asignatura, fichero.ano, 'cluster')
+        #lista_de_hilos_cluster = generar_hilos(lista_de_mensajes, 'Hilo', fichero.ano, 'cluster')
+        #lista_de_autores_cluster = generar_autores(lista_de_mensajes, lista_de_hilos, 'Remitente', fichero.ano, 'cluster')
 
         # # JSON WEKA GLOBAL CLUSTER
         # (acumulado mensajes, hilos y ) # #
-        lista_de_mensajes_global_cluster += lista_de_mensajes_cluster
-        lista_de_hilos_global_cluster += lista_de_hilos_cluster
+        #lista_de_mensajes_global_cluster += lista_de_mensajes_cluster
+        #lista_de_hilos_global_cluster += lista_de_hilos_cluster
         # (y autores) se hace al final con el acumulado #
         #lista_de_autores_global_cluster += lista_de_autores_cluster
 
@@ -103,11 +104,11 @@ if __name__ == '__main__':
         # SI EXISTE FICHERO ANOTADO CON LA CLASE '_Anotados.xlsx' # #
         if os.path.isfile(fichero.rutaynombre + '_Anotados.xlsx'):
             pandas_df_mensajes_clase = leer_excel(fichero.rutaynombre + '_Anotados', 'General')
-            print(pandas_df_mensajes_clase['Anotado'].to_numpy()[2], len(pandas_df_mensajes_clase['Anotado'].to_numpy()))
+            #print(pandas_df_mensajes_clase['Anotado'].to_numpy()[2], len(pandas_df_mensajes_clase['Anotado'].to_numpy()))
 
             lista_de_mensajes_clasificador = generar_mensajes_ampliado(rutaynombreUtf8, fichero.id_asignatura, fichero.ano, 'clasificador', pandas_df_mensajes_clase['Anotado'].to_numpy())
             lista_de_hilos_clasificador = generar_hilos(lista_de_mensajes, 'Hilo', fichero.ano, 'clasificador', pandas_df_mensajes_clase['Anotado'].to_numpy())
-            lista_de_autores_clasificador = generar_autores(lista_de_mensajes, lista_de_hilos, 'Remitente', fichero.ano, 'clasificador', pandas_df_mensajes_clase['Anotado'].to_numpy())
+            #lista_de_autores_clasificador = generar_autores(lista_de_mensajes, lista_de_hilos, 'Remitente', fichero.ano, 'clasificador', pandas_df_mensajes_clase['Anotado'].to_numpy())
 
             # # JSON WEKA GLOBAL CLASIFICADOR
             # (acumulado mensajes, hilos y ) # #
@@ -122,8 +123,15 @@ if __name__ == '__main__':
                                                                          lista_de_mensajes_clasificador)
             rutaynombreyextensionCsv_hilos_clasificador = generar_csv(fichero.rutaynombre + '_hilos_clasificador',
                                                                       lista_de_hilos_clasificador)
-            rutaynombreyextensionCsv_autores_clasificador = generar_csv(fichero.rutaynombre + '_autores_clasificador',
-                                                                        lista_de_autores_clasificador)
+            #rutaynombreyextensionCsv_autores_clasificador = generar_csv(fichero.rutaynombre + '_autores_clasificador',
+            #                                                            lista_de_autores_clasificador)
+
+            # ANOTADOS {T,O,T/O} y {O,T,T/O}
+            pandas_df_mensajes_anotados = generar_df(rutaynombreyextensionCsv_mensajes_clasificador)
+            pandas_df_autores_anotados = generar_df(rutaynombreyextensionCsv_hilos_clasificador)
+
+            escribir_excel(pandas_df_mensajes_anotados, fichero.rutaynombre + '_anotados_auto', 'Mensajes')
+            escribir_excel(pandas_df_autores_anotados, fichero.rutaynombre + '_anotados_auto', 'Hilos')
 
         ###################
         # ANÁLISIS de TEXTO
@@ -190,15 +198,15 @@ if __name__ == '__main__':
 
 
         # # 2. LIMPIEZA de Mensajes ([IMAGE: ] y FOROS Profesor-Tutor # #
-        #print('\nGenerando 1 Mensaje', re.compile('\(.*\)\,').split(lista_de_mensajes[0]['Texto mensaje']))
-        ## limpiarImagenMensaje('[IMAGE:.')
+        # print('\nGenerando 1 Mensaje', re.compile('\(.*\)\,').split(lista_de_mensajes[0]['Texto mensaje']))
+        # # limpiarImagenMensaje('[IMAGE:.')
 
         # # PRE PROCESADO FIN # #
 
         # # .CSV # #
         print('\nGenerando 1 .CSV')
-        #print('\nGenerando 1 .CSV', fichero.rutaynombre, lista_de_mensajes[0])
-        #rutaynombreyextensionCsv = generar_csv(rutaynombre, lista_de_mensajes)
+        # print('\nGenerando 1 .CSV', fichero.rutaynombre, lista_de_mensajes[0])
+        # rutaynombreyextensionCsv = generar_csv(rutaynombre, lista_de_mensajes)
         rutaynombreyextensionCsv_mensajes = generar_csv(fichero.rutaynombre + '_mensajes', lista_de_mensajes)
         rutaynombreyextensionCsv_hilos = generar_csv(fichero.rutaynombre + '_hilos', lista_de_hilos)
         rutaynombreyextensionCsv_autores = generar_csv(fichero.rutaynombre + '_autores', lista_de_autores)
@@ -206,9 +214,9 @@ if __name__ == '__main__':
 
         # # .CSV WEKA CLUSTER
         # (sin Títulos ni Textos) # #
-        rutaynombreyextensionCsv_mensajes_cluster = generar_csv(fichero.rutaynombre + '_mensajes_cluster', lista_de_mensajes_cluster)
-        rutaynombreyextensionCsv_hilos_cluster = generar_csv(fichero.rutaynombre + '_hilos_cluster', lista_de_hilos_cluster)
-        rutaynombreyextensionCsv_autores_cluster = generar_csv(fichero.rutaynombre + '_autores_cluster', lista_de_autores_cluster)
+        #rutaynombreyextensionCsv_mensajes_cluster = generar_csv(fichero.rutaynombre + '_mensajes_cluster', lista_de_mensajes_cluster)
+        #rutaynombreyextensionCsv_hilos_cluster = generar_csv(fichero.rutaynombre + '_hilos_cluster', lista_de_hilos_cluster)
+        #rutaynombreyextensionCsv_autores_cluster = generar_csv(fichero.rutaynombre + '_autores_cluster', lista_de_autores_cluster)
 
         # # Pandas DATA FRAME # #
         print('\nGenerando 1 Pandas DATA FRAME del .CSV')
@@ -255,7 +263,7 @@ if __name__ == '__main__':
 
         # # JSON WEKA GLOBAL CLUSTER
         # (acumulado mensajes, hilos, autores sin Títulos ni Textos) # #
-        lista_de_autores_global_cluster += generar_autores(lista_de_mensajes_global, lista_de_hilos_global, 'Remitente', ficheros[0]['ano'], 'cluster')
+        #lista_de_autores_global_cluster += generar_autores(lista_de_mensajes_global, lista_de_hilos_global, 'Remitente', ficheros[0]['ano'], 'cluster')
 
         # # .CSV WEKA GLOBAL
         # (Sin Títulos ni Textos) # #
@@ -265,9 +273,9 @@ if __name__ == '__main__':
 
         # # .CSV WEKA GLOBAL CLUSTER
         # (Sin Títulos ni Textos) # #
-        rutaynombreyextensionCsv_mensajes_global_cluster = generar_csv(ficheros[0]['ruta'] + 'acu_mensajes_global_cluster', lista_de_mensajes_global_cluster)
-        rutaynombreyextensionCsv_hilos_global_cluster = generar_csv(ficheros[0]['ruta'] + 'acu_hilos_global_cluster', lista_de_hilos_global_cluster)
-        rutaynombreyextensionCsv_autores_global_cluster = generar_csv(ficheros[0]['ruta'] + 'acu_autores_global_cluster', lista_de_autores_global_cluster)
+        #rutaynombreyextensionCsv_mensajes_global_cluster = generar_csv(ficheros[0]['ruta'] + 'acu_mensajes_global_cluster', lista_de_mensajes_global_cluster)
+        #rutaynombreyextensionCsv_hilos_global_cluster = generar_csv(ficheros[0]['ruta'] + 'acu_hilos_global_cluster', lista_de_hilos_global_cluster)
+        #rutaynombreyextensionCsv_autores_global_cluster = generar_csv(ficheros[0]['ruta'] + 'acu_autores_global_cluster', lista_de_autores_global_cluster)
 
         # # .CSV WEKA GLOBAL CLASIFICADOR
         # (Sin Títulos ni Textos y con la clase) #

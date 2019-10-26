@@ -28,13 +28,19 @@ def generar_df(input_file):
     # # Anonimizado (generar_df)
     # ESTOS CAMPOS SE DEBEN MANTENER PARA LA CORRECTA EXPORTACION A EXCEL
     # Hilo
-    df['Título'] = '(Borrado)'
+    if 'Título' in df.columns:
+        df['Título'] = '(Borrado)'
     # Textos
-    df['Título mensaje'] = '(Borrado)'
-    df['Texto mensaje'] = '(Borrado)'
+    if 'Título mensaje' in df.columns:
+        df['Título mensaje'] = '(Borrado)'
+    if 'Texto mensaje' in df.columns:
+        df['Texto mensaje'] = '(Borrado)'
 
     # Campo temporal
-    df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y %H:%M:%S')
+    if 'Date' in df.columns:
+        import datetime
+        if isinstance(df['Date'], datetime.date):
+            df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y %H:%M:%S')
 
     return df
 
@@ -52,17 +58,19 @@ def escribir_excel(df, nombre_archivo, nombre_hoja):
         # # Anonimizado (escribir_excel)
         # Autor anónimo
         # autor(Nombre1 Nombre 2 Apellido1 Apellido 2) == id_autor(HASH())
-        df['Autor'] = df['Remitente']
-        #print(df['Autor'])
-        #print(df['Remitente'])
+        if 'Autor' in df.columns:
+            df['Autor'] = df['Remitente']
+            #print(df['Autor'])
+            #print(df['Remitente'])
         with pd.ExcelWriter(excel, datetime_format='dd/mm/yyyy', date_format='dd/mm/yyyy', time_format='hh:mm:ss') as writer:
             df.to_excel(writer, sheet_name=nombre_hoja, engine='xlsxwriter')
     else:
         # # Autor anónimo
         # autor (Nombre1 Nombre 2 Apellido1 Apellido 2) == id_autor (HASH())
-        df['Autor'] = df['Remitente']
-        #print(df['Autor'])
-        #print(df['Remitente'])
+        if 'Autor' in df.columns:
+            df['Autor'] = df['Remitente']
+            #print(df['Autor'])
+            #print(df['Remitente'])
         with pd.ExcelWriter(excel, datetime_format='DD/MM/YYYY', date_format='DD/MM/YYYY', time_format='HH:MM:SS', mode='a') as writer:
             df.to_excel(writer, sheet_name=nombre_hoja, engine='xlsxwriter')
     print('Fichero Excel creado: ', excel)

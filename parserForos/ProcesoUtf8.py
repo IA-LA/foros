@@ -1062,15 +1062,14 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo, clase=''):
                             'Día': int(dia_semana_nombre[dia_semana]),
                             #'Fecha': fecha, 'Hora': hora,
                             'Date': abs(datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S") - datetime.strptime(
-                                  '01/09/' + curso + ' 00:00:00', "%d/%m/%Y %H:%M:%S")).total_seconds(),
+                                  '01/09/2010 00:00:00', "%d/%m/%Y %H:%M:%S")).total_seconds(),
                             'Distancia PH': int(date_ph), 'Distancia AS': int(date_as), 'Distancia OO': int(date_origen),
                             # DIFERENCIAS Padre-Hijo Antecesor-Sucesor
-
+                            'Diferencia PH': size_ph, 'Diferencia AS': size_as, 'Diferencia OO': len(nombre_foro) + len(tit_hilo) + len(tit_mensaje) + len(texto),
                             #'Título mensaje': tit_mensaje,
                             'Caracteres título mensaje': len(tit_mensaje),
                             #'Texto mensaje': texto.strip(),
                             'Caracteres texto mensaje': len(texto),
-                            'Diferencia PH': size_ph, 'Diferencia AS': size_as,
                             # ANÁLISIS de TEXTO
                             # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
                             #'Tokens': var_token,  # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras, 'ns': numero de stopwords}
@@ -1078,6 +1077,7 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo, clase=''):
                             # .SnowballStemmer("spanish").stem,
                             #'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas(Cantidad de información)}
                             'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
+                            'Cantidad de Información': var_raiz.get('nrd')/var_token.get('nt') if var_token.get('nt') != 0 else 0,
                             # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
                             #'Postag': var_pos,  # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
                             # PoS: # 'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
@@ -1107,15 +1107,14 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo, clase=''):
                             'Día': int(dia_semana_nombre[dia_semana]),
                             #'Fecha': fecha, 'Hora': hora,
                             'Date': abs(datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S") - datetime.strptime(
-                                  '01/09/' + curso + ' 00:00:00', "%d/%m/%Y %H:%M:%S")).total_seconds(),
+                                  '01/09/2010 00:00:00', "%d/%m/%Y %H:%M:%S")).total_seconds(),
                             'Distancia PH': int(date_ph), 'Distancia AS': int(date_as), 'Distancia OO': int(date_origen),
                             # DIFERENCIAS Padre-Hijo Antecesor-Sucesor
-
+                            'Diferencia PH': size_ph, 'Diferencia AS': size_as, 'Diferencia OO': len(nombre_foro) + len(tit_hilo) + len(tit_mensaje) + len(texto),
                             #'Título mensaje': tit_mensaje,
                             'Caracteres título mensaje': len(tit_mensaje),
                             #'Texto mensaje': texto.strip(),
                             'Caracteres texto mensaje': len(texto),
-                            'Diferencia PH': size_ph, 'Diferencia AS': size_as,
                             # ANÁLISIS de TEXTO
                             # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
                             #'Tokens': var_token,  # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras, 'ns': numero de stopwords}
@@ -1123,6 +1122,7 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo, clase=''):
                             # .SnowballStemmer("spanish").stem,
                             #'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas(Cantidad de información)}
                             'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
+                            'Cantidad de Información': var_raiz.get('nrd')/var_token.get('nt') if var_token.get('nt') != 0 else 0,
                             # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
                             #'Postag': var_pos,  # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
                             # PoS: # 'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
@@ -1146,19 +1146,20 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo, clase=''):
                             # DIFERENCIAS Padre-Hijo Antecesor-Sucesor
                             'Título mensaje': tit_mensaje, 'Caracteres título mensaje': len(tit_mensaje),
                             'Texto mensaje': texto.strip(), 'Caracteres texto mensaje': len(texto),
-                            'Diferencia PH': size_ph, 'Diferencia AS': size_as,
+                            'Diferencia PH': size_ph, 'Diferencia AS': size_as, 'Diferencia OO': len(nombre_foro) + len(tit_hilo) + len(tit_mensaje) + len(texto),
                             # ANÁLISIS de TEXTO
                             # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
                             # {"c": msj, "lc": longitud_caracteres, 't': lista_tokens, 'nt': numero_tokens, 'f': sentencias,
                             #             'nf': numero_frases, 'p': lista_palabras, 'np': numero_palabras, 'ns': numero_stop_words}
-                            'Tokens': var_token.get('t'),  # Revisión de los Nombres anónimos
-                            'Frases': var_token.get('f'),  # Revisión del los Nombres no anónimos
+                            'Tokens': var_token.get('t'),  # Anotación revisores externos y Revisión de los Nombres anónimos
+                            # 'Frases': var_token.get('f'),  # Revisión del los Nombres no anónimos
                             #'Tokens': var_token,
                             # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras, 'ns': numero de stopwords}
                             "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'), 'ns': var_token.get('ns'),
                             # .SnowballStemmer("spanish").stem,
                             'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas(Cantidad de información)}
                             'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
+                            'Cantidad de Información': var_raiz.get('nrd')/var_token.get('nt') if var_token.get('nt') != 0 else 0,
                             # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
                             # 'Postag': var_pos,  # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
                             # PoS: # 'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
@@ -1178,6 +1179,745 @@ def generar_mensajes_ampliado(ruta, id_asig, curso_asig, tipo, clase=''):
 
             if estado == 'MENSAJE':
                 texto = texto + ' ' + linea
+
+    return mensajes
+
+
+# Anónimos
+def generar_mensajes_anonimo(ruta, id_asig, curso_asig, tipo, clase=''):
+    global mensajes
+
+    print('#######')
+    print('MENSAJES')
+    print('#######')
+
+    lineas_anonimas = []
+    curso = curso_asig
+    with open(ruta, 'r', encoding='utf8') as f:
+        lineas = f.readlines()
+        lineas = [l.strip('\n') for l in lineas]
+        mensajes = []
+        # mensaje = []
+        n_mensajes = 0
+
+        # Atributos Base
+        id_foro = ""
+        # id_asignatura = 12345678
+        nombre_foro = ""
+        id_hilo = ""
+        tit_hilo = ""
+        clase_hilo = ''
+        id_mensaje = ""
+        id_ref_mensaje = ""
+        id_autor = ""
+        autor = ""
+        fecha = ""
+        dia_semana = ""
+        tit_mensaje = ""
+        texto = ""
+        estado = 'FIN_MENSAJE'
+        contador_lineas_titulo = 1
+        mensaje_no = ''
+
+        # Atributos Frecuentistas
+        # Mensaje
+        size_padre = 0
+        size_antecesor = 0
+        size_ph = 0
+        size_as = 0
+
+        date_padre = ''
+        date_antecesor = ''
+        date_ph = ''
+        date_ph = ''
+
+        padre_hilo = 0
+        n_mensajes_hilo = 0
+        inicial = 0
+        respuesta = 0
+        auto_respuesta = 0
+        terminal = 0
+
+        hilo = 0
+
+        # Hilo
+
+        # Atributos Texto
+        var_token = {}
+        var_raiz = {}
+        var_pos = {}
+
+        # Nombres
+        nombre_padre = ''
+        nombre_antecesor = ''
+        nombre_sucesor = ''
+
+        #from datetime import datetime
+
+        for index, linea in enumerate(lineas):
+
+            print(linea)
+            # Controla Títulos de Hilo y Mensaje de más de una línea
+            if estado == 'TITULO_LARGO':
+                # Títulos de +1 línea:
+                # Revisa la siguiente línea por si el título ocupa dos o + líneas
+                if not lineas[index + 1].startswith('_______________________________________________________________________________'):
+                    estado = 'TITULO_LARGO'
+                    tit_hilo = tit_hilo + ' ' + linea
+                    contador_lineas_titulo += 1
+                else:
+                    estado = 'MENSAJE'
+                    tit_hilo = tit_hilo + ' ' + linea
+                    # contador_lineas_titulo = 1
+
+            elif linea.startswith('Foro: '):
+                #print(linea.partition('Foro: ')[2])
+                nombre_foro = linea.partition('Foro: ')[2]
+                ## Foro
+                ## ID = HASH('Título Foro' + 'Date')
+                # Hash(FORO)
+                # con Fecha añadida para hacerlo único
+                id_foro = int(hashlib.sha1(nombre_foro.encode('utf-8') + str(datetime.now()).encode('utf-8')).hexdigest(), 16) % (10 ** 8)
+
+                # Anonimato:
+                ############
+                #linea = linea.replace(linea.partition('Foro: ')[2], str(id_foro), 1)
+
+            # Título de Hilo
+            elif linea.startswith('Mensajes de la conversación: '):
+
+                # Inicializa contador con el Nuevo Hilo
+                if contador_lineas_titulo > 1:
+                    contador_lineas_titulo = 1
+
+                # Títulos de +1 línea:
+                # Revisa la siguiente línea por si el título ocupa dos o + líneas
+                if not lineas[index + 1].startswith('_______________________________________________________________________________'):
+                    estado = 'TITULO_LARGO'
+                    contador_lineas_titulo += 1
+
+                tit_hilo = linea.partition('Título: ')[2]
+
+                ## Hilo
+                ## ID = HASH('Título del 1er Mensaje del  Hilo' + 'Date')
+                # Hash(HILO)
+                # con Fecha añadida para hacerlo único
+                id_hilo = int(hashlib.sha1(tit_hilo.encode('utf-8') + str(datetime.now()).encode('utf-8')).hexdigest(), 16) % (10 ** 8)
+
+                # Anonimato:
+                ############
+                #linea = linea.replace(linea.partition('Mensajes de la conversación: ')[2], str(id_foro), 1)
+
+            elif linea.startswith('Mensaje no. '):
+                if ' (Respuesta a no. ' in linea:
+                    respuesta_no = linea.partition(' (Respuesta a no. ')[2].partition(")")[0]
+                    mensaje_no = linea.partition('Mensaje no. ')[2].partition(' (Respuesta a no. ')[0]
+                    id_mensaje = str(id_hilo) + "_" + mensaje_no
+                    id_ref_mensaje = str(id_hilo) + "_" + respuesta_no
+
+                else:
+                    mensaje_no = linea.partition('Mensaje no. ')[2]
+                    id_mensaje = str(id_hilo) + "_" + mensaje_no
+                    id_ref_mensaje = ""
+                # print(mensaje_no)
+
+            elif linea.startswith('Enviado por: '):
+                autor = linea.partition('Enviado por: ')[2].partition(" el")[0]
+                ## Autor
+                ## ID = HASH('Nombres Apellidos' + 'Date')
+                # Hash(AUTOR)
+                id_autor = int(hashlib.sha1(autor.encode('utf-8')).hexdigest(), 16) % (10 ** 8)
+                ## Autor anónimo
+                #autor = id_autor
+
+                # Anonimato:
+                ############
+                linea = linea.replace(linea.partition('Enviado por: ')[2].partition(" el")[0], str(id_autor), 1)
+
+                fecha = linea.partition(" el ")[2].strip()
+                if not lineas[index + 1].startswith('Título: '):
+                    # print('bien, estado: ' + estado)
+                    fecha = fecha + " " + lineas[index + 1]
+                    # print(fecha)
+                # else:
+                #    print('bien : ' + fecha)
+                # print(fecha)
+
+            # Título de Mensaje
+            elif linea.startswith('Título: '):
+                # print(lineas[lineas.index(linea)-1])
+                # if not lineas[lineas.index(linea)-1].startswith('Enviado por: '):
+                #   fecha = fecha.strip() + ' ' + lineas[lineas.index(linea)-1].strip()
+                #  print(lineas[lineas.index(linea)-1], fecha)
+                # print(linea)
+
+                # Títulos de +1 línea:
+                # Revisa la siguiente línea por si el título ocupa dos líneas
+                if not lineas[index + 1].startswith('_______________________________________________________________________________'):
+                    estado = 'TITULO_LARGO'
+                    #tit_hilo = linea.partition('Título: ')[2] + lineas[index + 1]
+
+                #if mensaje_no == "1":
+                #    tit_hilo = linea.partition('Título: ')[2]
+
+                tit_mensaje = linea.partition('Título: ')[2]
+
+            # MENSAJE 79 caracteres
+            # '-------------------------------------------------------------------------------'
+            # HILO 79 caracteres
+            # '_______________________________________________________________________________'
+            # ULTIMO MENSAJE DE CADA HILO: CIERRE DE HILO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            # HILO 70 caracteres
+            elif linea.startswith('----------------------------------------------------------------------') or \
+                    linea.startswith('==============================================================================='):
+                    # FORO 79 caracteres
+
+                estado = 'FIN_MENSAJE'
+
+                if autor:
+                    fecha_parser = fecha.split(' ')
+                    dia_semana = fecha_parser[0]
+                    fecha = fecha_parser[1] + "/" + str(month_string_to_number(fecha_parser[2])) + "/" + fecha_parser[3]
+                    hora = fecha_parser[4]
+
+                    #######################
+                    # Tratamiento AMPLIADO de TEXTO \[(data|link|twitgram|anonimo|movil|email)\]
+                    #######################
+
+                    #
+                    # HTML ENTITY
+                    #
+                    # Busca entidades y los sustituye por el carácter equivalente
+                    import html as html
+
+                    #texto = html.unescape('Hola, cuando se concrete la fecha para &#39;APP-III&#39;, me dices, por mi parte, si me avisas con tiempo mejor&iexcl;&iexcl;  Saludos&iexcl;&iexcl;')
+                    texto = html.unescape(texto)
+
+                    #
+                    # ADJUNTOS (DOCUMENTOS, IMAGENES o EMOTICONOS)
+                    #
+                    import re
+
+                    def tratamiento(item):
+                        print(item)
+                        return item
+
+                    # Busca archivos Adjuntos y enlaces
+                    # Cuenta ADJUNTOS: las [IMAGE: '' ...]
+                    imagenes = re.findall(r'(\[IMAGE: \'\'.*\])', texto, re.M | re.I)
+                    n_adjs = len(imagenes)
+                    t_adj = 0
+                    if n_adjs > 0:
+                        for imagen in imagenes:
+                            t_adj = t_adj + len(imagen)
+                    else:
+                        t_adj = 0  # '0KB [IMAGE:.*])'
+
+                    # Cuenta EMOJI: las [IMAGE: '.+' ...]
+                    n_emojis = len(re.findall(r'(\[IMAGE: \'.+\'.*\])', texto, re.M | re.I))
+                    if n_emojis > 0:
+                        print()
+                        #print('EMOJIS:', n_emojis)
+
+                    # Cuenta LINKS
+                    n_links = 0
+                    n_links_r = 0
+
+                    # Busca ADJUNTOS Y EMOJIS y los reemplaza por [DATA]
+                    if texto.find('[IMAGE:') != -1:
+                        #print('ADJUNTOS ENCONTRADOS: ', n_adjs)
+                        # Busca [IMAGE:
+                        regex = re.search(r'(\[IMAGE: .*\])', texto, re.M | re.I)
+                        if regex != None:
+                            # Reemplaza todos los ADJUNTOS Y EMOJIS [IMAGE:] por [DATA] Ampliación: poner tipo [DATA:XXX]
+                            texto = re.sub(r'(\[IMAGE: .*\])', ' [DATA] ', texto)
+                            # print(regex.group(1))
+                            # print(texto)
+                            # exit(12345567890)
+
+                    # Busca LINKS (ya eliminados ADJUNTOS y EMOJIS)
+                    if texto.find('http') != -1:
+                        # Todos los http
+                        n_links = len(re.findall(r'(http)', texto, re.M | re.I))
+                        #print('LINKS ENCONTRADOS: ', n_links)
+
+                    # Busca links y los reemplaza por [LINK]
+                    n_links_r = len(re.findall(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''', texto, re.M | re.I))
+                    if n_links_r != 0:
+                        # Reemplaza todos los LINKS (http) (sin ADJUNTOS y EMOJIS)
+                        texto = re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''', ' [LINK] ', texto)
+                        #print('LINKS REEMPLAZADOS: ', n_links_r, texto)
+
+                    # Cuenta ARROBAS, HASHTAG Y MOVILES
+                    n_arrobas = 0
+                    n_emails_r = 0
+                    n_twiters_r = 0
+                    n_hashtags = 0
+                    n_hashtagr_r = 0
+                    n_moviles = 0
+                    n_moviles_r = 0
+                    n_abrev = 0
+                    n_abrev_r = 0
+
+                    # Busca ARROBAS y los reemplaza por [EMAIL] o [TWITGRAM]
+                    if texto.find('@') != -1:
+                        # Todos los email, twitter o telegram id
+                        n_arrobas = len(re.findall(r'(@)', texto, re.M | re.I))
+                        # print('ARROBAS ENCONTRADAS: ', n_arrobas)
+                    # Busca EMAILS y los reemplaza por [EMAIL]
+                    n_emails_r = len(re.findall(r'([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)', texto, re.M | re.I))
+                    if n_emails_r != 0:
+                        # Reemplaza todos los EMAILS (a@a.a) (sin LINKS, ADJUNTOS y EMOJIS)
+                        texto = re.sub(r'([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)', ' [EMAIL] ', texto)
+                        #print('EMAILS REEMPLAZADOS: ', n_emails_r, texto)
+                    # Busca TWITTER/TELEGRAM ID (@a) y los reemplaza por [                                                                                                                                                                                                                                                                                                ]
+                    n_twitters_r = len(re.findall(r'(^|[^@\w])@(\w{1,15})\b', texto, re.M | re.I))
+                    if n_twitters_r != 0:
+                        # Reemplaza todos los TWITTER/TELEGRAMS ID (@a) (sin EMAILS, LINKS, ADJUNTOS y EMOJIS)
+                        texto = re.sub(r'(^|[^@\w])@(\w{1,15})\b', ' [TWITGRAM] ', texto)
+                        #print('TWITTER/TELEGRAM ID REEMPLAZADOS: ', n_twitters_r, texto)
+
+                    # Busca HASHTAGS (#) y los reemplaza por ' [HASHTAG] '
+                    # r'#(\w+)'
+                    if texto.find('#') != -1:
+                        # Todos los hashtags
+                        n_hashtags = len(re.findall(r'(#)', texto, re.M | re.I))
+                        # print('HASHTAGS ENCONTRADAS: ', n_hashtags)
+                    # Busca HASHTAGS ID y los reemplaza por [HASHTAG]
+                    n_hashtags_r = len(re.findall(r'(^|[^#\w])#(\w{1,15})\b', texto, re.M | re.I))
+                    if n_hashtags_r != 0:
+                        # Reemplaza todos los HASHTAGS (#a) (sin TWITTER/TELEGRAMS, EMAILS, LINKS, ADJUNTOS y EMOJIS)
+                        texto = re.sub(r'(^|[^#\w])#(\w{1,15})\b', ' [HASHTAG] ', texto)
+                        #print('HASHTAGS REEMPLAZADOS: ', n_hashtags_r, texto)
+
+                    # Busca NUMEROS DE MOVIL y los reemplaza por ' [MOVIL] ' DE CONTACTO O GRUPOS DE TELEGRAM/WHATSAPP
+                    # r'(\+34|0034|34)?[ -.]*(6|7)[ -.]*([0-9][ -.]*){8}'
+                    if texto.find('6') != -1 or texto.find('7') != -1:
+                        # Todos los móviles
+                        n_moviles = len(re.findall(r'(\+34|0034|34)?[ -.]*(6|7)[ -.]*([0-9][ -.]*){8}', texto, re.M | re.I))
+                        # print('MOVILES ENCONTRADOS: ', n_moviles)
+                    # Busca MOVILES y los reemplaza por [MOVIL]
+                    n_moviles_r = len(re.findall(r'(\+34|0034|34)?[ -.]*(6|7)[ -.]*([0-9][ -.]*){8}', texto, re.M | re.I))
+                    if n_moviles_r != 0:
+                        # Reemplaza todos los MOVILES (#a) (sin HASHTAGS, TWITTER/TELEGRAMS, EMAILS, LINKS, ADJUNTOS y EMOJIS)
+                        texto = re.sub(r'(\+34|0034|34)?[ -.]*(6|7)[ -.]*([0-9][ -.]*){8}', ' [MOVIL] ', texto)
+                        #print('MOVILES REEMPLAZADOS: ', n_moviles_r, texto)
+
+                    # Busca NUMEROS DE DNI o NIE y los reemplaza por ' [DNI] '
+                    # NIE: r'([X-Z]{1})([-]?)(\d{7})([-]?)([A-Z]{1})'
+                    # DNI: r'(\d{8})([-]?)([A-Z]{1})
+                    # r'(([x-zX-Z]{1})([-]?)(((\d){7,8}|((\d){1,2}\W{1,2}(\d){3}\W{1,2}(\d){3}))([-]?))([-]?)([a-zA-Z]{1}))|(((\d){8}|((\d){1,2}\W{1,2}(\d){3}\W{1,2}(\d){3}))([-]?))([a-zA-Z]{1})
+                    n_dnis_r = len(re.findall(r'(([x-zX-Z]{1})([-]?)(((\d){7,8}|((\d){1,2}\W{1,2}(\d){3}\W{1,2}(\d){3}))([-]?))([-]?)([a-zA-Z]{1}))|(((\d){8}|((\d){1,2}\W{1,2}(\d){3}\W{1,2}(\d){3}))([-]?))([a-zA-Z]{1})', texto, re.M | re.I))
+                    if n_dnis_r != 0:
+                        # Reemplaza todos los DNI (#a) (sin MOVILES HASHTAGS, TWITTER/TELEGRAMS, EMAILS, LINKS, ADJUNTOS y EMOJIS)
+                        texto = re.sub(r'(([x-zX-Z]{1})([-]?)(((\d){7,8}|((\d){1,2}\W{1,2}(\d){3}\W{1,2}(\d){3}))([-]?))([-]?)([a-zA-Z]{1}))|(((\d){8}|((\d){1,2}\W{1,2}(\d){3}\W{1,2}(\d){3}))([-]?))([a-zA-Z]{1})', ' [DNI] ', texto)
+                        print('DNIS REEMPLAZADOS: ', n_dnis_r, texto)
+
+                    #
+                    # ABREVIATURAS DE NOMBRES
+                    #
+                    # Busca nombres y los sustituye por ' [ANONIMO] '
+
+                    # Busca Abreviaturas Nombres Mª, Mª., M.ª, Fco, Fco.
+                    #                    Apellidos Gª, Gª., G.ª
+                    #  y los reemplaza por ' ANONIMO ' ' Maria ' ' Francisco ' ' Garcia '
+                    if texto.find('Mª') != -1 or texto.find('Mª.') != -1 or texto.find('M.ª') != -1 or texto.find('Gª') != -1 or texto.find('Gª.') != -1 or texto.find('G.ª') != -1:
+                        # or texto.find('Fco') != -1 or texto.find('Fco.') != -1 or texto.find('Fco') != -1:
+                        # Todas las abreviaturas
+                        n_abrev = len(re.findall(r'(M|m|G|g)[ .]*ª[ .]*', texto, re.M | re.I))
+                        #print('ABREVIATURAS ENCONTRADAS: ', n_abrev)
+                    # Busca ABREVIATURAS y las reemplaza por ' [ANONIMO] '
+                    n_abrev_r = len(re.findall(r'(M|m|G|g)[ .]*ª[ .]*', texto, re.M | re.I))
+                    if n_abrev_r != 0:
+                        # Reemplaza todos las ABREVIATURAS
+                        texto = re.sub(r'(M|m|G|g)[ .]*ª[ .]*', ' [ANONIMO] ', texto)
+                        #print('ABREVIATURAS REEMPLAZADAS: ', n_abrev_r, texto)
+
+                    #######################
+                    # FIN Tratamiento AMPLIADO de TEXTO \[(data|link|twitgram|anonimo|movil|email)\]
+                    #######################
+
+                    ###################
+                    # ANÁLISIS de TEXTO x MENSAJE
+                    ###################
+                    from procesadoGeneral import tokenizado
+                    from procesadoGeneral import enraizado
+                    from procesadoGeneral import postag
+                    from procesadoGeneral import cluster
+
+                    #
+                    # ANÁLISIS del TEXTO MENSAJE
+                    #
+                    #print('TOKENIZADO MENSAJE')
+                    print('TOKENIZADO MENSAJE(', len(mensajes), ') ASIG(', id_asig, ') TIPO(', tipo, '): ', nombre_antecesor + ' ' + nombre_sucesor + ' ' + nombre_padre)
+                    # var_token = {'t': 0, 'lc': 0, 'nt': 0, 'nf': 0, 'np': 0, 'ns': 0}
+                    var_token = tokenizado(texto.strip(), nombre_antecesor + ' ' + nombre_sucesor + ' ' + nombre_padre)
+                    #print('TOKENIZADO MENSAJE(', len(mensajes), '). ')
+                    #print('TOKENIZADO MENSAJE')
+                    #print('TOKENIZADO MENSAJE(', n_mensajes_hilo, '): ', var_token)
+
+                    #print('RAICES MENSAJE')
+                    print('RAICES MENSAJE(', len(mensajes), ') ASIG(', id_asig, ') TIPO(', tipo, '): ')
+                    var_raiz = enraizado()
+                    #print('RAICES MENSAJE(', len(mensajes), '). ')
+                    #print('RAICES MENSAJE')
+                    #print('RAICES MENSAJE(', var_token, '): ', var_raiz)
+
+                    #print('POSTAG MENSAJE')
+                    # print('POSTAG MENSAJE(', len(mensajes), ') ASIG(', id_asig, ') TIPO(', tipo, '): ')
+                    #var_pos = postag(texto.strip())
+                    #print('POSTAG MENSAJE(', len(mensajes), '). ')
+                    #print('POSTAG MENSAJE')
+                    #print('POSTAG MENSAJE(', len(mensajes), '): ', var_pos)
+
+                    #print('CLUSTER MENSAJE')
+                    # print('CLUSTER MENSAJE(', len(mensajes), ') ASIG(', id_asig, ') TIPO(', tipo, '): ')
+                    #var_clu = cluster()
+                    #print('CLUSTER MENSAJE')
+                    #print('CLUSTER MENSAJE: ', var_clu)
+
+                    # exit(999)
+
+                    #
+                    # ANÁLISIS del TITULO DEL TEXTO ????????????????????????????????????????????????????????????????????
+                    #
+
+                    # exit(999)
+
+                    #
+                    # TOPIC MODELLING, t-SNE, Spectral Clusterin de un MENASJE ?????????????????????????????????????????
+                    #
+
+                    # exit(999)
+
+                    #
+                    # CLUSTERING de MENASJE
+                    #
+                    #var_clu = cluster()
+                    #print('CLUSTER MENSAJE: ', var_clu)
+
+                    # exit(999)
+
+                    #
+                    # POSICIONES EN HILO
+                    #
+                    # INICIAL
+                    if id_ref_mensaje == '':
+
+                        # Padre-Hijo
+                        nombre_padre = autor
+
+                        # Antecesor-Sucesor
+                        nombre_antecesor = nombre_sucesor
+                        nombre_sucesor = autor
+
+                    # RESPUESTAS
+                    else:
+
+                        # Padre-Hijo
+
+                        # Antecesor-Sucesor
+                        nombre_antecesor = nombre_sucesor
+                        nombre_sucesor = autor
+
+                    #
+                    # DIFERENCIAS (len(nombre_foro) + len(tit_hilo) + len(tit_mensaje) + len(texto))
+                    #
+
+                    # INICIAL
+                    if id_ref_mensaje == '':
+
+                        size_padre = len(tit_mensaje) + len(texto)
+
+                        # Padre-Hijo
+                        size_ph = 0
+
+                        # Antecesor-Sucesor
+                        size_as = 0
+
+                        size_antecesor = len(tit_mensaje) + len(texto)
+
+                    # RESPUESTAS
+                    else:
+
+                        # Padre-Hijo
+                        size_ph = (len(tit_mensaje) + len(texto)) - size_padre
+
+                        # Antecesor-Sucesor
+                        size_as = (len(tit_mensaje) + len(texto)) - size_antecesor
+
+                        size_antecesor = len(tit_mensaje) + len(texto)
+
+                    #
+                    # DISTANCIAS  datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S")
+                    #
+                    #from datetime import datetime
+
+                    # INICIAL
+                    if id_ref_mensaje == '':
+
+                        date_padre = datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S")  # fecha + ' ' + hora
+
+                        # Padre-Hijo en días
+                        date_ph = abs(date_padre - date_padre).total_seconds()  # Valor 0
+                        # Antecesor-Sucesor en segundos
+                        date_as = abs(date_padre - date_padre).total_seconds()  # Valor 0
+
+                        date_antecesor = datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S")  # fecha + ' ' + hora
+
+                    # RESPUESTA
+                    else:
+
+                        # Padre-Hijo en días
+                        date_ph = abs(datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S") -
+                                      date_padre).total_seconds()  # (fecha + ' ' + hora) - date_padre
+
+                        # Antecesor-Sucesor en segundos
+                        date_as = abs(datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S") -
+                                      date_antecesor).total_seconds()  # (fecha + ' ' + hora) - date_antecesor
+
+                        date_antecesor = datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S")  # fecha + ' ' + hora
+
+                        # 1er Mensaje
+                        if len(mensajes) == 0:
+                            print()
+                            #print(date_ph, date_as)
+
+                    # DISTANCIA AL ORIGEN #
+                    # Permite ordenar por fecha de forma directa #
+                    date_origen = abs(datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S") - datetime.strptime(
+                        '01/09/' + curso + ' 00:00:00', "%d/%m/%Y %H:%M:%S")).total_seconds()
+
+                    #
+                    # TIPOS MENSAJE (INICIAL, RESPUESTA o TERMINAL)
+                    #
+
+                    # Tipos x posición
+                    # INICIAL
+                    if id_ref_mensaje == '':
+
+                        # Define PADRE HILO
+                        # controla si son auto-respuestas o participantes distintos
+
+                        # Excepción:
+                        # Si la variable 'padre_hilo' no exite la inicializa
+                        try:
+                            padre_hilo = padre_hilo
+                            padre_hilo = id_autor
+                        except NameError:
+                            padre_hilo = id_autor
+
+                        inicial = 1
+                        respuesta = 0  # 'inicial'
+                        auto_respuesta = 0  # 'no'
+                        terminal = 0  # 'sinrespuesta'
+
+                        # Redefine TERMINAL
+                        # si un menssaje es Inicial
+                        # revisa los anteriores (-1,-2,-3,-4,...)
+                        # anotándoles como Terminal
+
+                        # Excepción:
+                        # Si la variable 'n_mensajes_hilo' no exite la inicializa
+                        try:
+                            n_mensajes_hilo = n_mensajes_hilo
+                        except NameError:
+                            n_mensajes_hilo = 1
+
+                        for i in range(1, n_mensajes_hilo, 1):
+                            # Mensaje único del hilo
+                            # 0 'sinrespuesta'
+                            mensajes[len(mensajes) - i]['Terminal'] = -i
+
+                        # Mensaje INICIAL del Hilo
+                        n_mensajes_hilo = 1
+                        hilo = 1
+
+                    # RESPUESTA o TERMINAL
+                    # id_ref_mensaje != ''
+                    else:
+                        inicial = n_mensajes_hilo
+                        # HILO
+                        # AUTO-RESPUESTA
+                        auto_respuesta = 0
+                        if padre_hilo == id_autor:
+                            auto_respuesta = 1  # 'autorespuesta', "rectificación", "agradecimiento"
+                        # SUBHILO
+                        if int(id_mensaje.split('_')[1]) - int(id_ref_mensaje.split('_')[1]) != 1:
+                            subpadre = id_ref_mensaje.split('_')[1]
+                            if respuesta > 0:  # & int(subpadre) != respuesta:
+                                respuesta = - int(subpadre)
+                                hilo = - int(subpadre)  # "subhilos 1,2,3,4,..."
+                            else:
+                                respuesta = int(subpadre)
+                                hilo = int(subpadre)  # "subhilos 1,2,3,4,..."
+                        else:
+                            respuesta = hilo  # "subhilos 1,2,3,4,..."
+                        # TERMINAL
+                        terminal = 0  # 'posible'
+
+                    #print()
+
+                    # Actualización Nº Mensajes RESPUESTA del Hilo
+                    n_mensajes_hilo = n_mensajes_hilo + 1
+
+                    ########################
+                    # Derfinición de MENSAJE (ampliado)
+                    ########################
+                    # mensaje=[tit_hilo, id_hilo, id_mensaje, id_ref_mensaje, id_autor, autor, dia_semana, fecha, tit_mensaje, texto]
+                    if tipo == 'cluster':
+                        mensaje = {
+                            # BASE #
+                            'Asignatura': int(id_asig),
+                            'Foro': id_foro,
+                            #'Nombre foro': nombre_foro,
+                            'Caracteres foro': len(nombre_foro),
+                            'Hilo': id_hilo,
+                            #'Título': tit_hilo,
+                            'Caracteres hilo': len(tit_hilo),
+                            #'Mensaje': id_mensaje, 'Responde a': id_ref_mensaje,
+                            'Remitente': id_autor, 'Autor': id_autor,
+                            # TIPO INICIAL, TERMINAL, RESPUESTA Y AUTO-RESPUESTA
+                            'Inicial': inicial, 'Respuesta': respuesta, 'Auto-respuesta': auto_respuesta,
+                            'Terminal': terminal,
+                            # DISTANCIAS Padre-Hijo Antecesor-Sucesor
+                            'Día': int(dia_semana_nombre[dia_semana]),
+                            #'Fecha': fecha, 'Hora': hora,
+                            'Date': abs(datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S") - datetime.strptime(
+                                  '01/09/2010 00:00:00', "%d/%m/%Y %H:%M:%S")).total_seconds(),
+                            'Distancia PH': int(date_ph), 'Distancia AS': int(date_as), 'Distancia OO': int(date_origen),
+                            # DIFERENCIAS Padre-Hijo Antecesor-Sucesor
+                            'Diferencia PH': size_ph, 'Diferencia AS': size_as, 'Diferencia OO': len(nombre_foro) + len(tit_hilo) + len(tit_mensaje) + len(texto),
+                            #'Título mensaje': tit_mensaje,
+                            'Caracteres título mensaje': len(tit_mensaje),
+                            #'Texto mensaje': texto.strip(),
+                            'Caracteres texto mensaje': len(texto),
+                            # ANÁLISIS de TEXTO
+                            # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
+                            #'Tokens': var_token,  # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras, 'ns': numero de stopwords}
+                            "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'), 'ns': var_token.get('ns'),
+                            # .SnowballStemmer("spanish").stem,
+                            #'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas(Cantidad de información)}
+                            'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
+                            'Cantidad de Información': var_raiz.get('nrd')/var_token.get('nt') if var_token.get('nt') != 0 else 0,
+                            # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
+                            #'Postag': var_pos,  # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
+                            # PoS: # 'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
+                            'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links,
+                            'Curso': int(curso),
+                        }
+                    elif tipo == 'clasificador':
+                        # Recoge CLASES anotadas
+                        if isinstance(clase[len(mensajes)], str): #numpy.isnan(clase[len(mensajes)]):
+                            clase_hilo = clase[len(mensajes)]
+                        mensaje = {
+                            # BASE #
+                            'Clase': clase_hilo,
+                            'Asignatura': int(id_asig),
+                            'Foro': id_foro,
+                            #'Nombre foro': nombre_foro,
+                            'Caracteres foro': len(nombre_foro),
+                            'Hilo': id_hilo,
+                            #'Título': tit_hilo,
+                            'Caracteres hilo': len(tit_hilo),
+                            #'Mensaje': id_mensaje, 'Responde a': id_ref_mensaje,
+                            'Remitente': id_autor, 'Autor': id_autor,
+                            # TIPO INICIAL, TERMINAL, RESPUESTA Y AUTO-RESPUESTA
+                            'Inicial': inicial, 'Respuesta': respuesta, 'Auto-respuesta': auto_respuesta,
+                            'Terminal': terminal,
+                            # DISTANCIAS Padre-Hijo Antecesor-Sucesor
+                            'Día': int(dia_semana_nombre[dia_semana]),
+                            #'Fecha': fecha, 'Hora': hora,
+                            'Date': abs(datetime.strptime(fecha + ' ' + hora, "%d/%m/%Y %H:%M:%S") - datetime.strptime(
+                                  '01/09/2010 00:00:00', "%d/%m/%Y %H:%M:%S")).total_seconds(),
+                            'Distancia PH': int(date_ph), 'Distancia AS': int(date_as), 'Distancia OO': int(date_origen),
+                            # DIFERENCIAS Padre-Hijo Antecesor-Sucesor
+                            'Diferencia PH': size_ph, 'Diferencia AS': size_as, 'Diferencia OO': len(nombre_foro) + len(tit_hilo) + len(tit_mensaje) + len(texto),
+                            #'Título mensaje': tit_mensaje,
+                            'Caracteres título mensaje': len(tit_mensaje),
+                            #'Texto mensaje': texto.strip(),
+                            'Caracteres texto mensaje': len(texto),
+                            # ANÁLISIS de TEXTO
+                            # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
+                            #'Tokens': var_token,  # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras, 'ns': numero de stopwords}
+                            "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'), 'ns': var_token.get('ns'),
+                            # .SnowballStemmer("spanish").stem,
+                            #'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas(Cantidad de información)}
+                            'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
+                            'Cantidad de Información': var_raiz.get('nrd')/var_token.get('nt') if var_token.get('nt') != 0 else 0,
+                            # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
+                            #'Postag': var_pos,  # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
+                            # PoS: # 'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
+                            'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links,
+                            'Curso': int(curso),
+                        }
+                    else:  # General
+                        mensaje = {
+                            # BASE #
+                            'Asignatura': int(id_asig),
+                            'Foro': id_foro, 'Nombre foro': nombre_foro, 'Caracteres foro': len(nombre_foro),
+                            'Hilo': id_hilo, 'Título': tit_hilo, 'Caracteres hilo': len(tit_hilo),
+                            'Mensaje': id_mensaje, 'Responde a': id_ref_mensaje,
+                            'Remitente': id_autor, 'Autor': autor,
+                            # TIPO INICIAL, TERMINAL, RESPUESTA Y AUTO-RESPUESTA
+                            'Inicial': inicial, 'Respuesta': respuesta, 'Auto-respuesta': auto_respuesta, 'Terminal': terminal,
+                            # DISTANCIAS Padre-Hijo Antecesor-Sucesor
+                            'Día': dia_semana,
+                            'Fecha': fecha, 'Hora': hora, 'Date': fecha + ' ' + hora,
+                            'Distancia PH': int(date_ph), 'Distancia AS': int(date_as), 'Distancia OO': int(date_origen),
+                            # DIFERENCIAS Padre-Hijo Antecesor-Sucesor
+                            'Título mensaje': tit_mensaje, 'Caracteres título mensaje': len(tit_mensaje),
+                            'Texto mensaje': texto.strip(), 'Caracteres texto mensaje': len(texto),
+                            'Diferencia PH': size_ph, 'Diferencia AS': size_as, 'Diferencia OO': len(nombre_foro) + len(tit_hilo) + len(tit_mensaje) + len(texto),
+                            # ANÁLISIS de TEXTO
+                            # 'nltk.tokenize.sent_tokenize', .corpus.stopwords,
+                            # {"c": msj, "lc": longitud_caracteres, 't': lista_tokens, 'nt': numero_tokens, 'f': sentencias,
+                            #             'nf': numero_frases, 'p': lista_palabras, 'np': numero_palabras, 'ns': numero_stop_words}
+                            'Tokens': var_token.get('t'),  # Anotación revisores externos y Revisión de los Nombres anónimos
+                            # 'Frases': var_token.get('f'),  # Revisión del los Nombres no anónimos
+                            #'Tokens': var_token,
+                            # {"lc": longitud_caracteres, 'nt': numero_tokens, 'nf': numero_frases, 'np': numero_palabras, 'ns': numero de stopwords}
+                            "lc": var_token.get('lc'), 'nt': var_token.get('nt'), 'nf': var_token.get('nf'), 'np': var_token.get('np'), 'ns': var_token.get('ns'),
+                            # .SnowballStemmer("spanish").stem,
+                            'Raices': var_raiz,  # {'nr': numero_raices, 'nrd': numero_raices_distintas(Cantidad de información)}
+                            'nr': var_raiz.get('nr'), 'nrd': var_raiz.get('nrd'),
+                            'Cantidad de Información': var_raiz.get('nrd')/var_token.get('nt') if var_token.get('nt') != 0 else 0,
+                            # 'nltk.tokenize.word_tokenize, .corpus.stopwords, .SnowballStemmer("spanish").stem, .tag.stanford',
+                            # 'Postag': var_pos,  # {'nn': numero_nombres, 'nv': numero_verbos, 'nnd': numero_nombres_distintos, 'nvd': numero_verbos_distintos}
+                            # PoS: # 'nn': var_pos.get('nn'), 'nv': var_pos.get('nv'), 'nnd': var_pos.get('nnd'), 'nvd': var_pos.get('nvd'),
+                            'Adjuntos': n_adjs, 'Tamaño adjuntos': t_adj, 'Emojis': n_emojis, 'Links': n_links,
+                            'Curso': int(curso),
+                        }
+
+                    mensajes.append(mensaje)
+
+
+                    # Anonimato:
+                    ############
+                    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + str(mensaje['Texto mensaje']) + "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
+                    #linea = texto
+                    #lineas_anonimas.append(texto + '\n')
+
+                    # Limpia variables
+                    texto = ""
+                    autor = ""
+                    # print(linea)
+
+            if lineas[index - 1].startswith('Título: '):
+                estado = 'MENSAJE'
+
+            if estado == 'MENSAJE':
+                texto = texto + ' ' + linea
+
+            else:
+                if linea.startswith('_______________________________________________________________________________'):
+                    estado = 'MENSAJE'
+
+            lineas_anonimas.append(linea+'\n')
+
+    print(lineas_anonimas)
+    with open(ruta.split('utf8')[0] + '_anonimo.txt', 'w', encoding='utf8') as f_destino:
+        f_destino.writelines(lineas_anonimas)
 
     return mensajes
 
@@ -1267,6 +2007,14 @@ def generar_hilos(mensajes, campo, curso_asig, tipo, clase=''):
     n_auto_respuestas = 0
     longitud = 0  # Tamaño texto
     distancia = 0  # Duración
+
+    # 'Distancia PH': int(date_ph), 'Distancia AS': int(date_as), 'Distancia OO': int(date_origen),
+    # 'Diferencia PH': size_ph, 'Diferencia AS': size_as, 'Diferencia OO': len(nombre_foro) + len(tit_hilo) + len(tit_mensaje) + len(texto),
+    longitud_hilo = 0
+    distancia_hilo = 0
+    longitud_00 = 0
+    distancia_00 = 0
+
     # ACUMULADOS ANÁLISIS TEXTO
     lc = 0
     nt = 0
@@ -1279,6 +2027,8 @@ def generar_hilos(mensajes, campo, curso_asig, tipo, clase=''):
     nnd = 0
     nv = 0
     nvd = 0
+    # 'Cantidad de Información': var_raiz.get('nrd') / var_token.get('nt') if var_token.get('nt') != 0 else 0,
+    cdi = 0
     # ACUMULADOS ADJUNTOS
     n_adjs = 0
     t_adj = 0
