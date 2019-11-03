@@ -4,6 +4,19 @@ from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 
 
+# PARTE TEXTO EN TOKENS HASTA 72(n) CARACTERES
+def parte_texto(texto, n):
+    texto_partido = ''
+    contador = 0
+    for index, c in enumerate(texto):
+        if contador >= n and c == ' ':
+            texto_partido += c + '\n'
+            contador = 0
+        else:
+            texto_partido += c
+            contador += 1
+    return texto_partido
+
 # DISTANCIA ENTRE TERMINOS
 def distancia_combinada(token_a, token_b):
     # VOCALES ['a', 'á', 'e', 'é', 'i', 'í', 'o', 'ó', 'u', 'ú']
@@ -119,37 +132,45 @@ def distancia_combinada(token_a, token_b):
 # SENTIMIENTO POSITIVO NEGATIVO
 # pondera la clasificación
 def ponderarClasificacion(clasificaciones):
-  clasificacion = ''
-  n = 0
-  for c in clasificaciones:
-    if(clasificaciones.count(c) > n):
-      n = clasificaciones.count(c)
-      clasificacion = c
-    #print(c, clasificacion, clasificaciones.count(c))
-  return clasificacion
+    clasificacion = ''
+    n = 0
+    for c in clasificaciones:
+        if(clasificaciones.count(c) > n):
+            n = clasificaciones.count(c)
+            clasificacion = c
+        # print(c, clasificacion, clasificaciones.count(c))
+    return clasificacion
+
 
 # diccionario !!!!!!
 def word_feats(words):
-  return dict([(word, True) for word in words])
+    return dict([(word, True) for word in words])
 
-#NOMBRES DE GENERO
+
+# NOMBRES DE GENERO
 def gender_features3(palabra):
-  return {'first_letter': palabra[0], 'last_letter': palabra[-1], 'length': len(palabra), 'ngramas': len(palabra.split(' '))}
+    return {'first_letter': palabra[0], 'last_letter': palabra[-1],
+            'length': len(palabra), 'ngramas': len(palabra.split(' '))}
+
 
 def gender_features2(palabra):
-  return {'first_letter': palabra[0], 'last_letter': palabra[-1], 'length': len(palabra)}
+    return {'first_letter': palabra[0], 'last_letter': palabra[-1], 'length': len(palabra)}
+
 
 def gender_features1(palabra):
-  return {'first_letter': palabra[0], 'last_letter': palabra[-1]}
+    return {'first_letter': palabra[0], 'last_letter': palabra[-1]}
+
 
 def gender_features(word):
-  return {'last_letter': word[-1]}
+    return {'last_letter': word[-1]}
 
-def sum( arg1, arg2 ):
+
+def sum(arg1, arg2):
   # Add both the parameters and return them."
   total = arg1 + arg2
   print ("Inside the function : ", total)
   return total
+
 
 data = "All work and no play makes jack dull boy. All work and no play makes jack a dull boy."
 mensaje = "All work and no play makes jack dull boy. All work and no play makes jack a dull boy. Mierda para tu puta madre. Caca de la vaca, para el resto"
@@ -178,13 +199,13 @@ stopWords = set(stopwords.words('spanish'))
 palabras = []
 
 for t in tokens:
-  if t not in stopWords:
-    palabras.append(t)
+    if t not in stopWords:
+        palabras.append(t)
 
 print("before __name__ procesadoMensaje guard")
-#if __name__ == '__main__':
+# if __name__ == '__main__':
 if __name__ == 'procesadoMensaje':
-  print(gender_features1('main'))
-  print(gender_features2('main'))
-  print(gender_features3('main'))
+    print(gender_features1('main'))
+    print(gender_features2('main'))
+    print(gender_features3('main'))
 print("after __name__ procesadoMensaje guard")

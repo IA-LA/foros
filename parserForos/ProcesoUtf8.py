@@ -1216,7 +1216,8 @@ def generar_mensajes_anonimo(ruta, id_asig, curso_asig, tipo, clase=''):
         tit_mensaje = ""
         texto = ""
         estado = 'FIN_MENSAJE'
-        contador_lineas_titulo = 1
+        contador_lineas_titulo_hilo = 1
+        contador_lineas_titulo_mensajes = 1
         mensaje_no = ''
 
         # Atributos Frecuentistas
@@ -1248,27 +1249,60 @@ def generar_mensajes_anonimo(ruta, id_asig, curso_asig, tipo, clase=''):
         var_pos = {}
 
         # Nombres
+        lista_nombres_previos = ''
         nombre_padre = ''
         nombre_antecesor = ''
         nombre_sucesor = ''
 
         #from datetime import datetime
 
+        ## PRE-PROCESO
+        ##############
+        # Recupera todos los nombres del foro
+        for linea in lineas:
+            if linea.startswith('Enviado por: '):
+                lista_nombres_previos = lista_nombres_previos + ' ' + linea.partition('Enviado por: ')[2].partition(" el")[0]
+
         for index, linea in enumerate(lineas):
 
             print(linea)
+
+            ## PROCESO
+            ##########
             # Controla Títulos de Hilo y Mensaje de más de una línea
-            if estado == 'TITULO_LARGO':
+            # Controla Títulos de Hilo de más de una línea
+            if estado == 'TITULO_HILO_LARGO':
                 # Títulos de +1 línea:
                 # Revisa la siguiente línea por si el título ocupa dos o + líneas
                 if not lineas[index + 1].startswith('_______________________________________________________________________________'):
-                    estado = 'TITULO_LARGO'
-                    tit_hilo = tit_hilo + ' ' + linea
-                    contador_lineas_titulo += 1
+                    estado = 'TITULO_HILO_LARGO'
+                    tit_hilo = tit_hilo + linea
+                    contador_lineas_titulo_hilo += 1
                 else:
+                    estado = 'HILO'
+                    tit_hilo = tit_hilo + linea
+                    print('FIN D TITULO_HILO_LARGO', contador_lineas_titulo_hilo, tit_hilo)
+                    # contador_lineas_titulo_hilo = 1
+
+            # Controla Títulos de Mensaje de más de una línea
+            elif contador_lineas_titulo_hilo > 1 and contador_lineas_titulo_mensajes <= contador_lineas_titulo_hilo and estado == 'TITULO_MENSAJE_LARGO':
+                # Comprobar que esta línea del Titulo del mensaje corresponde al Título del Hilo
+                contador_lineas_titulo_mensajes += 1
+                # Comprobar si el Título del Mensaje no incluye todo el Título del Hilo
+                # print('FINDDDDDDDDDDDDDDDDDDDD:', contador_lineas_titulo_hilo, tit_hilo in (' ' + tit_mensaje + ' '), tit_mensaje, tit_hilo)
+                if (linea in tit_hilo) or tit_hilo not in (' ' + tit_mensaje + ' '):
+                    estado = 'TITULO_MENSAJE_LARGO'
+                    tit_mensaje = tit_mensaje + linea
+                # Inicializa lineas mensaje
+                else:
+                    # Inicio del texto del mensaje (final del proceso de lectura del título de mensaje largo)
                     estado = 'MENSAJE'
-                    tit_hilo = tit_hilo + ' ' + linea
-                    # contador_lineas_titulo = 1
+                    print('FIN D TITULO_MENSAJE_LARGO', contador_lineas_titulo_mensajes, tit_mensaje)
+                    contador_lineas_titulo_mensajes = 1
+                    ## LINEAS ANONIMAS
+                    ######################
+                    lineas_anonimas.append('Título: ' + tit_mensaje + '\n')
+                    ######################
 
             elif linea.startswith('Foro: '):
                 #print(linea.partition('Foro: ')[2])
@@ -1287,16 +1321,15 @@ def generar_mensajes_anonimo(ruta, id_asig, curso_asig, tipo, clase=''):
             elif linea.startswith('Mensajes de la conversación: '):
 
                 # Inicializa contador con el Nuevo Hilo
-                if contador_lineas_titulo > 1:
-                    contador_lineas_titulo = 1
+                contador_lineas_titulo_hilo = 1
 
                 # Títulos de +1 línea:
                 # Revisa la siguiente línea por si el título ocupa dos o + líneas
                 if not lineas[index + 1].startswith('_______________________________________________________________________________'):
-                    estado = 'TITULO_LARGO'
-                    contador_lineas_titulo += 1
+                    estado = 'TITULO_HILO_LARGO'
+                    contador_lineas_titulo_hilo += 1
 
-                tit_hilo = linea.partition('Título: ')[2]
+                tit_hilo = linea.partition('Mensajes de la conversación: ')[2]
 
                 ## Hilo
                 ## ID = HASH('Título del 1er Mensaje del  Hilo' + 'Date')
@@ -1351,16 +1384,15 @@ def generar_mensajes_anonimo(ruta, id_asig, curso_asig, tipo, clase=''):
                 #  print(lineas[lineas.index(linea)-1], fecha)
                 # print(linea)
 
-                # Títulos de +1 línea:
-                # Revisa la siguiente línea por si el título ocupa dos líneas
-                if not lineas[index + 1].startswith('_______________________________________________________________________________'):
-                    estado = 'TITULO_LARGO'
-                    #tit_hilo = linea.partition('Título: ')[2] + lineas[index + 1]
-
                 #if mensaje_no == "1":
                 #    tit_hilo = linea.partition('Título: ')[2]
-
                 tit_mensaje = linea.partition('Título: ')[2]
+
+                contador_lineas_titulo_mensajes = 1
+                # Actuar si el Título del Hilo es LARGO el Título del Mensaje también puede serlo
+                if contador_lineas_titulo_hilo > 1:
+                    estado = 'TITULO_MENSAJE_LARGO'
+                    print('FINDDDDDDDDDDDDDDDDDDDD:', tit_mensaje, tit_hilo,)
 
             # MENSAJE 79 caracteres
             # '-------------------------------------------------------------------------------'
@@ -1392,6 +1424,7 @@ def generar_mensajes_anonimo(ruta, id_asig, curso_asig, tipo, clase=''):
 
                     #texto = html.unescape('Hola, cuando se concrete la fecha para &#39;APP-III&#39;, me dices, por mi parte, si me avisas con tiempo mejor&iexcl;&iexcl;  Saludos&iexcl;&iexcl;')
                     texto = html.unescape(texto)
+                    # print('HTML UNESCAPE', texto)
 
                     #
                     # ADJUNTOS (DOCUMENTOS, IMAGENES o EMOTICONOS)
@@ -1458,6 +1491,8 @@ def generar_mensajes_anonimo(ruta, id_asig, curso_asig, tipo, clase=''):
                     n_moviles_r = 0
                     n_abrev = 0
                     n_abrev_r = 0
+                    n_saltosdelinea_r = 0
+                    var_anonima_partida = ''
 
                     # Busca ARROBAS y los reemplaza por [EMAIL] o [TWITGRAM]
                     if texto.find('@') != -1:
@@ -1538,6 +1573,37 @@ def generar_mensajes_anonimo(ruta, id_asig, curso_asig, tipo, clase=''):
                     #######################
 
                     ###################
+                    # ANONIMATO de TEXTO x MENSAJE
+                    ###################
+                    from procesadoGeneral import anonimato
+                    from procesadoMensaje import parte_texto
+
+                    # ANONIMATO TEXTO
+                    ###################
+                    # print('ANONIMATO MENSAJE')
+                    print('ANONIMATO MENSAJE(', len(mensajes), ') ASIG(', id_asig, ') TIPO(', tipo, '): ',
+                          lista_nombres_previos)
+                    # var_anonima = texto
+                    var_anonima = anonimato(texto, lista_nombres_previos)
+
+                    # Busca MARCA_DE_SALTO_DE_LINEA_EN_EL_TEXTO_BRUTO y las reemplaza por ' \n '
+                    n_saltosdelinea_r = len(re.findall(r'MARCA_DE_SALTO_DE_LINEA_EN_EL_TEXTO_BRUTO', var_anonima, re.M | re.I))
+                    # Reemplaza todos las MARCA_DE_SALTO_DE_LINEA_EN_EL_TEXTO_BRUTO
+                    var_anonima = re.sub(r'MARCA_DE_SALTO_DE_LINEA_EN_EL_TEXTO_BRUTO', ' \n ', var_anonima)
+                    # print('MARCA_DE_SALTO_DE_LINEA_EN_EL_TEXTO_BRUTO', texto, var_anonima)
+
+
+                    ## LINEAS ANONIMAS
+                    ######################
+                    # var_anonima_partida = parte_texto(var_anonima, 72) ## MARCA_DE_SALTO_DE_LINEA_EN_EL_TEXTO_BRUTO
+                    # print('TEXTO PARTIDO', var_anonima)
+                    # print('TEXTO PARTIDO', var_anonima_partida)
+                    lineas_anonimas.append(var_anonima + '\n')
+                    ###################
+                    # FIN ANONIMATO de TEXTO x MENSAJE
+                    ###################
+
+                    ###################
                     # ANÁLISIS de TEXTO x MENSAJE
                     ###################
                     from procesadoGeneral import tokenizado
@@ -1550,15 +1616,16 @@ def generar_mensajes_anonimo(ruta, id_asig, curso_asig, tipo, clase=''):
                     #
                     #print('TOKENIZADO MENSAJE')
                     print('TOKENIZADO MENSAJE(', len(mensajes), ') ASIG(', id_asig, ') TIPO(', tipo, '): ', nombre_antecesor + ' ' + nombre_sucesor + ' ' + nombre_padre)
-                    # var_token = {'t': 0, 'lc': 0, 'nt': 0, 'nf': 0, 'np': 0, 'ns': 0}
-                    var_token = tokenizado(texto.strip(), nombre_antecesor + ' ' + nombre_sucesor + ' ' + nombre_padre)
+                    var_token = {'t': 0, 'lc': 0, 'nt': 0, 'nf': 0, 'np': 0, 'ns': 0}
+                    # var_token = tokenizado(texto.strip(), nombre_antecesor + ' ' + nombre_sucesor + ' ' + nombre_padre)
                     #print('TOKENIZADO MENSAJE(', len(mensajes), '). ')
                     #print('TOKENIZADO MENSAJE')
                     #print('TOKENIZADO MENSAJE(', n_mensajes_hilo, '): ', var_token)
 
                     #print('RAICES MENSAJE')
                     print('RAICES MENSAJE(', len(mensajes), ') ASIG(', id_asig, ') TIPO(', tipo, '): ')
-                    var_raiz = enraizado()
+                    var_raiz = {'r': 0, 'nr': 0, 'rd': 0, 'nrd': 0}
+                    # var_raiz = enraizado()
                     #print('RAICES MENSAJE(', len(mensajes), '). ')
                     #print('RAICES MENSAJE')
                     #print('RAICES MENSAJE(', var_token, '): ', var_raiz)
@@ -1891,29 +1958,75 @@ def generar_mensajes_anonimo(ruta, id_asig, curso_asig, tipo, clase=''):
 
                     mensajes.append(mensaje)
 
-
                     # Anonimato:
                     ############
-                    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + str(mensaje['Texto mensaje']) + "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
+                    #print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + str(mensaje['Texto mensaje']) + "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
                     #linea = texto
-                    #lineas_anonimas.append(texto + '\n')
+
+                    ## LINEAS ANONIMAS
+                    ######################
+                    # lineas_anonimas.append('AAAAAAAAAAAAAAA\n' + mensaje['Texto mensaje'] + '\nBBBBBBBBBBBB')
+                    ######################
 
                     # Limpia variables
                     texto = ""
                     autor = ""
                     # print(linea)
 
-            if lineas[index - 1].startswith('Título: '):
+            ## POST-PROCESO
+            ###############
+            # TITULO Y CUERPO DEL MENSAJE
+            if lineas[index - contador_lineas_titulo_hilo].startswith('Título: '):
                 estado = 'MENSAJE'
 
+            # CUERPO DEL MENSAJE
             if estado == 'MENSAJE':
-                texto = texto + ' ' + linea
+                texto = texto + ' MARCA_DE_SALTO_DE_LINEA_EN_EL_TEXTO_BRUTO ' + linea
 
+                ###################
+                # ANONIMATO TEXTO MENSAJE (LINEA x LINEA)
+                ###################
+                #from procesadoGeneral import anonimato
+
+                # ANONIMATO
+                ###################
+                # print('ANONIMATO MENSAJE')
+                #print('ANONIMATO MENSAJE(', len(mensajes), ') ASIG(', id_asig, ') TIPO(', tipo, '): ',
+                #      lista_nombres_previos)
+                #var_anonima = anonimato(linea, lista_nombres_previos)
+                # var_anonima = linea
+
+                ## LINEAS ANONIMAS
+                ######################
+                #lineas_anonimas.append(var_anonima + '\n')
+                ###################
+                # FIN ANONIMATO de TEXTO x MENSAJE
+                ###################
+
+            # OTRAS PARTES DEL MENSAJE
             else:
-                if linea.startswith('_______________________________________________________________________________'):
+                # Títulos de subhilos distintos al hilo padre
+                if contador_lineas_titulo_mensajes > contador_lineas_titulo_hilo and estado == 'TITULO_MENSAJE_LARGO':
+                    # Inicio del texto del mensaje (final del proceso de lectura del título de mensaje largo)
                     estado = 'MENSAJE'
-
-            lineas_anonimas.append(linea+'\n')
+                    print('FIN D TITULO_MENSAJE_LARGO DISTINTO AL HILO PADRE', contador_lineas_titulo_mensajes, tit_mensaje)
+                    contador_lineas_titulo_mensajes = 1
+                    ## LINEAS ANONIMAS
+                    ######################
+                    lineas_anonimas.append('Título: ' + tit_mensaje + '\n')
+                    ######################
+                if linea.startswith('_______________________________________________________________________________'):
+                    estado = 'HILO'
+                    ## LINEAS ANONIMAS
+                    ######################
+                    #lineas_anonimas.append(tit_hilo + '\n')
+                    lineas_anonimas.append(linea + '\n')
+                    ######################
+                elif estado != 'TITULO_MENSAJE_LARGO':
+                    ## LINEAS ANONIMAS
+                    ######################
+                    lineas_anonimas.append(linea + '\n')
+                    ######################
 
     print(lineas_anonimas)
     with open(ruta.split('utf8')[0] + '_anonimo.txt', 'w', encoding='utf8') as f_destino:

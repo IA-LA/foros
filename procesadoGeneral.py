@@ -12,6 +12,8 @@ import os
 
 import json
 
+import re
+
 # Módulos propios
 import procesadoMensaje
 
@@ -32,13 +34,15 @@ lista_raices = []
 mensajes = []
 tags = []
 
+nombres = []
+
 longitud_media_tokens = 0.0
 longitud_media_frases = 0.0
 
 synonyms = []
 antonyms = []
 
-
+########################
 ## CALSES MENSAJE     ##
 ########################
 id_foro = 16735771
@@ -185,9 +189,311 @@ ss = SnowballStemmer('spanish')
 spanish_postagger = StanfordPOSTagger(os.path.join(dir_path, 'standford/models/spanish.tagger'),
                                       os.path.join(dir_path, 'standford/stanford-postagger.jar'), encoding='utf8')
 
+
 ########################
 # PROCESADO Y ANALISIS
 ########################
+
+# STOPWORDS
+########################
+# Array de stopwords personalizado
+stop_words = stopwords.words('spanish')
+
+# Añadir signos de puntuación
+stop_words.append('.')
+stop_words.append(':')
+stop_words.append(',')
+stop_words.append(';')
+stop_words.append('-')
+stop_words.append('"')
+stop_words.append('¡')
+stop_words.append('!')
+stop_words.append('¡')
+stop_words.append('?')
+stop_words.append('&')
+stop_words.append('/')
+stop_words.append('(')
+stop_words.append(')')
+stop_words.extend(
+    ('¡', '¿', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<',
+     '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~'))
+
+
+# ANONIMATO
+########################
+def anonimato(msj=mensaje, nombres=''):
+    texto = msj
+
+    #######################
+    # Tratamiento TEXTO
+    # Etiquetas: [(DATA|LINK|TWITGRAM|HASHTAG|MOVIL|EMAIL|DNI|ANONIMO)]
+    #######################
+
+    #
+    # HTML ENTITY
+    #
+    # Busca entidades y los sustituye por el carácter equivalente
+    import html as html
+
+    # texto = html.unescape('Hola, cuando se concrete la fecha para &#39;APP-III&#39;, me dices, por mi parte, si me avisas con tiempo mejor&iexcl;&iexcl;  Saludos&iexcl;&iexcl;')
+    texto = html.unescape(texto)
+
+    #
+    # ADJUNTOS (DOCUMENTOS, IMAGENES o EMOTICONOS)
+    #
+    import re
+
+    # Busca archivos Adjuntos y enlaces
+    # Cuenta ADJUNTOS: las [IMAGE: '' ...]
+    imagenes = re.findall(r'(\[IMAGE: \'\'.*\])', texto, re.M | re.I)
+    n_adjs = len(imagenes)
+    t_adj = 0
+    if n_adjs > 0:
+        for imagen in imagenes:
+            t_adj = t_adj + len(imagen)
+    else:
+        t_adj = 0  # '0KB [IMAGE:.*])'
+
+    # Cuenta EMOJI: las [IMAGE: '.+' ...]
+    n_emojis = len(re.findall(r'(\[IMAGE: \'.+\'.*\])', texto, re.M | re.I))
+    if n_emojis > 0:
+        print()
+        # print('EMOJIS:', n_emojis)
+
+    # Cuenta LINKS
+    n_links = 0
+    n_links_r = 0
+
+    # Busca ADJUNTOS Y EMOJIS y los reemplaza por [DATA]
+    if texto.find('[IMAGE:') != -1:
+        # print('ADJUNTOS ENCONTRADOS: ', n_adjs)
+        # Busca [IMAGE:
+        regex = re.search(r'(\[IMAGE: .*\])', texto, re.M | re.I)
+        if regex != None:
+            # Reemplaza todos los ADJUNTOS Y EMOJIS [IMAGE:] por [DATA] Ampliación: poner tipo [DATA:XXX]
+            texto = re.sub(r'(\[IMAGE: .*\])', ' [DATA] ', texto)
+            # print(regex.group(1))
+            # print(texto)
+            # exit(12345567890)
+
+    # Busca LINKS (ya eliminados ADJUNTOS y EMOJIS)
+    if texto.find('http') != -1:
+        # Todos los http
+        n_links = len(re.findall(r'(http)', texto, re.M | re.I))
+        # print('LINKS ENCONTRADOS: ', n_links)
+
+    # Busca links y los reemplaza por [LINK]
+    n_links_r = len(re.findall(
+        r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''',
+        texto, re.M | re.I))
+    if n_links_r != 0:
+        # Reemplaza todos los LINKS (http) (sin ADJUNTOS y EMOJIS)
+        texto = re.sub(
+            r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''',
+            ' [LINK] ', texto)
+        # print('LINKS REEMPLAZADOS: ', n_links_r, texto)
+
+    # Cuenta ARROBAS, HASHTAG Y MOVILES
+    n_arrobas = 0
+    n_emails_r = 0
+    n_twiters_r = 0
+    n_hashtags = 0
+    n_hashtagr_r = 0
+    n_moviles = 0
+    n_moviles_r = 0
+    n_abrev = 0
+    n_abrev_r = 0
+
+    # Busca ARROBAS y los reemplaza por [EMAIL] o [TWITGRAM]
+    if texto.find('@') != -1:
+        # Todos los email, twitter o telegram id
+        n_arrobas = len(re.findall(r'(@)', texto, re.M | re.I))
+        # print('ARROBAS ENCONTRADAS: ', n_arrobas)
+    # Busca EMAILS y los reemplaza por [EMAIL]
+    n_emails_r = len(re.findall(r'([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)', texto, re.M | re.I))
+    if n_emails_r != 0:
+        # Reemplaza todos los EMAILS (a@a.a) (sin LINKS, ADJUNTOS y EMOJIS)
+        texto = re.sub(r'([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)', ' [EMAIL] ', texto)
+        # print('EMAILS REEMPLAZADOS: ', n_emails_r, texto)
+    # Busca TWITTER/TELEGRAM ID (@a) y los reemplaza por [                                                                                                                                                                                                                                                                                                ]
+    n_twitters_r = len(re.findall(r'(^|[^@\w])@(\w{1,15})\b', texto, re.M | re.I))
+    if n_twitters_r != 0:
+        # Reemplaza todos los TWITTER/TELEGRAMS ID (@a) (sin EMAILS, LINKS, ADJUNTOS y EMOJIS)
+        texto = re.sub(r'(^|[^@\w])@(\w{1,15})\b', ' [TWITGRAM] ', texto)
+        # print('TWITTER/TELEGRAM ID REEMPLAZADOS: ', n_twitters_r, texto)
+
+    # Busca HASHTAGS (#) y los reemplaza por ' [HASHTAG] '
+    # r'#(\w+)'
+    if texto.find('#') != -1:
+        # Todos los hashtags
+        n_hashtags = len(re.findall(r'(#)', texto, re.M | re.I))
+        # print('HASHTAGS ENCONTRADAS: ', n_hashtags)
+    # Busca HASHTAGS ID y los reemplaza por [HASHTAG]
+    n_hashtags_r = len(re.findall(r'(^|[^#\w])#(\w{1,15})\b', texto, re.M | re.I))
+    if n_hashtags_r != 0:
+        # Reemplaza todos los HASHTAGS (#a) (sin TWITTER/TELEGRAMS, EMAILS, LINKS, ADJUNTOS y EMOJIS)
+        texto = re.sub(r'(^|[^#\w])#(\w{1,15})\b', ' [HASHTAG] ', texto)
+        # print('HASHTAGS REEMPLAZADOS: ', n_hashtags_r, texto)
+
+    # Busca NUMEROS DE MOVIL y los reemplaza por ' [MOVIL] ' DE CONTACTO O GRUPOS DE TELEGRAM/WHATSAPP
+    # r'(\+34|0034|34)?[ -.]*(6|7)[ -.]*([0-9][ -.]*){8}'
+    if texto.find('6') != -1 or texto.find('7') != -1:
+        # Todos los móviles
+        n_moviles = len(re.findall(r'(\+34|0034|34)?[ -.]*(6|7)[ -.]*([0-9][ -.]*){8}', texto, re.M | re.I))
+        # print('MOVILES ENCONTRADOS: ', n_moviles)
+    # Busca MOVILES y los reemplaza por [MOVIL]
+    n_moviles_r = len(re.findall(r'(\+34|0034|34)?[ -.]*(6|7)[ -.]*([0-9][ -.]*){8}', texto, re.M | re.I))
+    if n_moviles_r != 0:
+        # Reemplaza todos los MOVILES (#a) (sin HASHTAGS, TWITTER/TELEGRAMS, EMAILS, LINKS, ADJUNTOS y EMOJIS)
+        texto = re.sub(r'(\+34|0034|34)?[ -.]*(6|7)[ -.]*([0-9][ -.]*){8}', ' [MOVIL] ', texto)
+        # print('MOVILES REEMPLAZADOS: ', n_moviles_r, texto)
+
+    # Busca NUMEROS DE DNI o NIE y los reemplaza por ' [DNI] '
+    # NIE: r'([X-Z]{1})([-]?)(\d{7})([-]?)([A-Z]{1})'
+    # DNI: r'(\d{8})([-]?)([A-Z]{1})
+    # r'(([x-zX-Z]{1})([-]?)(((\d){7,8}|((\d){1,2}\W{1,2}(\d){3}\W{1,2}(\d){3}))([-]?))([-]?)([a-zA-Z]{1}))|(((\d){8}|((\d){1,2}\W{1,2}(\d){3}\W{1,2}(\d){3}))([-]?))([a-zA-Z]{1})
+    n_dnis_r = len(re.findall(
+        r'(([x-zX-Z]{1})([-]?)(((\d){7,8}|((\d){1,2}\W{1,2}(\d){3}\W{1,2}(\d){3}))([-]?))([-]?)([a-zA-Z]{1}))|(((\d){8}|((\d){1,2}\W{1,2}(\d){3}\W{1,2}(\d){3}))([-]?))([a-zA-Z]{1})',
+        texto, re.M | re.I))
+    if n_dnis_r != 0:
+        # Reemplaza todos los DNI (#a) (sin MOVILES HASHTAGS, TWITTER/TELEGRAMS, EMAILS, LINKS, ADJUNTOS y EMOJIS)
+        texto = re.sub(
+            r'(([x-zX-Z]{1})([-]?)(((\d){7,8}|((\d){1,2}\W{1,2}(\d){3}\W{1,2}(\d){3}))([-]?))([-]?)([a-zA-Z]{1}))|(((\d){8}|((\d){1,2}\W{1,2}(\d){3}\W{1,2}(\d){3}))([-]?))([a-zA-Z]{1})',
+            ' [DNI] ', texto)
+        print('DNIS REEMPLAZADOS: ', n_dnis_r, texto)
+
+    #
+    # ABREVIATURAS DE NOMBRES
+    #
+    # Busca nombres y los sustituye por ' [ANONIMO] '
+
+    # Busca Abreviaturas Nombres Mª, Mª., M.ª, Fco, Fco.
+    #                    Apellidos Gª, Gª., G.ª
+    #  y los reemplaza por ' ANONIMO ' ' Maria ' ' Francisco ' ' Garcia '
+    if texto.find('Mª') != -1 or texto.find('Mª.') != -1 or texto.find('M.ª') != -1 or texto.find(
+            'Gª') != -1 or texto.find('Gª.') != -1 or texto.find('G.ª') != -1:
+        # or texto.find('Fco') != -1 or texto.find('Fco.') != -1 or texto.find('Fco') != -1:
+        # Todas las abreviaturas
+        n_abrev = len(re.findall(r'(M|m|G|g)[ .]*ª[ .]*', texto, re.M | re.I))
+        # print('ABREVIATURAS ENCONTRADAS: ', n_abrev)
+    # Busca ABREVIATURAS y las reemplaza por ' [ANONIMO] '
+    n_abrev_r = len(re.findall(r'(M|m|G|g)[ .]*ª[ .]*', texto, re.M | re.I))
+    if n_abrev_r != 0:
+        # Reemplaza todos las ABREVIATURAS
+        texto = re.sub(r'(M|m|G|g)[ .]*ª[ .]*', ' [ANONIMO] ', texto)
+        # print('ABREVIATURAS REEMPLAZADAS: ', n_abrev_r, texto)
+
+    #######################
+    # FIN Tratamiento AMPLIADO de TEXTO \[(data|link|twitgram|anonimo|movil|email)\]
+    #######################
+
+    #######################
+    # REVISAR NOMBRES AUTOR
+    #######################
+
+    # print('#######')
+    # print('ESPACIAR TEXTO CON PUNTO, PUNTO Y COMA O DOS PUNTOS, ... ETC.')
+    # print('#######')
+    import re
+
+    # msj = re.sub(r'\.', ' . ', msj)
+    texto = re.sub(r'(\W)([.;:¿¡"*])(\w)', '\\1 \\2 \\3', texto)
+    texto = re.sub(r'([¿¡])(\w)', '\\1 \\2', texto)
+
+    #print('#######')
+    #print('TEXT TOKENS')
+    #print('#######')
+    lista_tokens = word_tokenize(texto)
+    # lista_tokens = texto.split(' ')
+    texto_anonimo = '_'.join(lista_tokens)
+    print('TOKEN STRIP 1', lista_tokens, texto, texto_anonimo)
+    # for token in lista_tokens:
+    #    print('TOKEN STRIP 1.1', token)
+
+    # print('ELIMINAR NOMBRES APELLIDOS: ANTECESOR, AUTOR y PADRE')
+    # print('#######')
+    # print('pruebas')
+    # print(nltk.edit_distance('Alfred', 'Aldred'), nltk.jaccard_distance(set('Alfred'), set('Aldred')))
+    # print(nltk.edit_distance('Purificación', 'Puri'), nltk.jaccard_distance(set('Purificación'), set('Puri')))
+    # exit(999)
+
+    if nombres != '':
+        #print("NOMBREEEEEEEE:", nombres)
+
+        # Nombres y apellidos compuestos partidos
+        nombres_c = [nombre for nombre in nombres.replace(' ', '-').split('-') if nombre]
+
+        # Extrae la lista de los nombres
+        nombres = [nombre for nombre in nombres.split(' ') if nombre] + nombres_c
+        #print("NOMBREEEEEEEE C:", nombres)
+
+        # Nombres y Apellidos compuestos
+        # Bigramas
+        from nltk import bigrams
+
+        nombres_b = " ".join(["-".join(bi) if bi[0] != '' and bi[1] != '' else '' for bi in bigrams(nombres)])
+        nombres_b = [nombre for nombre in nombres_b.split(' ') if nombre]
+
+        # Nombres y apellidos compuestos con bigramas
+        nombres = nombres + nombres_b
+        #print("NOMBREEEEEEEE B:", nombres)
+
+        # Quitar artículos de la lista de nombres
+        # Quitar stopwords: (nombre in stop_words)
+        # Quitar repetidos
+        lista_nombres = set(['' if (len(nombre) < 3) or (nombre.lower() in stop_words) else nombre for nombre in nombres])
+
+        # Quitar Tildes Castellano, Catalán, ¿¿¿ Más tildes: ( ´ ` ) ^ ¨ ???
+        lista_nombres = [nombre.replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace('Á', 'A').replace('É', 'E').replace('Í', 'I').replace('Ó', 'O').replace('Ú', 'U').replace('à', 'a').replace('é', 'e').replace('ì', 'i').replace('ò', 'o').replace('ù', 'u').replace('À', 'A').replace('È', 'E').replace('Ì', 'I').replace('Ò', 'O').replace('Ù', 'U') for nombre in lista_nombres]
+        lista_tokens = [token.replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace('Á', 'A').replace('É', 'E').replace('Í', 'I').replace('Ó', 'O').replace('Ú', 'U').replace('à', 'a').replace('é', 'e').replace('ì', 'i').replace('ò', 'o').replace('ù', 'u').replace('À', 'A').replace('È', 'E').replace('Ì', 'I').replace('Ò', 'O').replace('Ù', 'U') for token in lista_tokens]
+
+        # print('TOKEN STRIP 1.2', lista_nombres, lista_tokens)
+
+        lista_tokens = ['[ANONIMO]' if token in lista_nombres else token for token in lista_tokens]
+
+        # Distancia Levenshtein       |    Distancia Jaccard
+        # ---------------------       |    -----------------
+        # nltk.edit_distance(w1, w2)  |    nltk.jaccard_distance(set(w1), set(w2))
+        # Para tokens originales (0, 0.0) o para tokens en minúsculas (0, 0.0) de longitud inferior o igual a 3 caracteres
+        # Para tokens originales (1, 0.2) o para tokens en minúsculas (1, 0.1) de longitud superior a 3 caracteres
+        for nombre in lista_nombres:
+            lista_tokens = ['[ANONIMO]' if (
+                    # Nombres Cortos
+                    ((((nltk.edit_distance(token, nombre) <= 0 and nltk.jaccard_distance(set(token), set(nombre)) <= 0.0)) or
+                     ((nltk.edit_distance(token.lower(), nombre.lower()) <= 0 and nltk.jaccard_distance(set(token.lower()), set(nombre.lower())) <= 0.0)))
+                     and len(token) <= 3) or
+                    # Nombres Largos
+                    ((((nltk.edit_distance(token, nombre) <= 0 and nltk.jaccard_distance(set(token), set(nombre)) <= 0.2)) or
+                     ((nltk.edit_distance(token.lower(), nombre.lower()) <= 1 and nltk.jaccard_distance(set(token.lower()), set(nombre.lower())) <= 0.1)))
+                     and len(token) > 3)) else token for token in lista_tokens]
+
+            # print('TOKEN STRIP 1.3', lista_tokens)
+        #lista_tokens = ['[ANONIMO]' if (
+        #        (nltk.edit_distance(token, lista_nombres[1]) <= 1 and nltk.jaccard_distance(set(token), set(lista_nombres[1])) <= 0.2)
+        #        and len(token) > 3) else token for token in lista_tokens]
+        #lista_tokens = ['[ANONIMO]' if (
+        #        ((nltk.edit_distance(token, nombre) <= 1 and nltk.jaccard_distance(set(token), set(nombre)) <= 0.2) for nombre in lista_nombres)
+        #        and len(token) > 3) else token for token in lista_tokens]
+
+        #lista_tokens = ['[ANONIMO]' if procesadoMensaje.distancia_combinada(token, lista_nombres[1]) <= 1.5 else token for token in lista_tokens]
+        #lista_tokens = ['[ANONIMO]' if nltk.jaccard_distance(set(token), set(lista_nombres[1])) <= 0.2 else token for token in lista_tokens]
+        #lista_tokens = ['[ANONIMO]' if (nltk.edit_distance(token, lista_nombres[1]) == 1 and len(nombre) == len(lista_nombres[1]) and nltk.jaccard_distance(set(token), set(lista_nombres[1])) < 0.5) else token for token in lista_tokens]
+
+        #print("NOMBREEEEEEEE:", lista_nombres)
+
+        # print('#######')
+        # print('TEXT UNTOKENS')
+        # print('#######')
+        # Join the string based on ' ' delimiter
+        texto_anonimo = ' '.join(lista_tokens)
+        print('TOKEN STRIP 2', lista_tokens, texto, texto_anonimo)
+
+
+    #######################
+    # FIN REVISAR NOMBRES AUTOR
+    #######################
+
+    return texto_anonimo  # + '\n #####################################################\n' + msj
 
 
 # TOKEN
@@ -218,7 +524,8 @@ def tokenizado(msj=mensaje, nombres=''):
     import re
 
     #msj = re.sub(r'\.', ' . ', msj)
-    msj = re.sub(r'(\W)([.;:¿"*])(\w)', '\\1 \\2 \\3', msj)
+    msj = re.sub(r'(\W)([.;:¿¡"*])(\w)', '\\1 \\2 \\3', msj)
+    msj = re.sub(r'([¿¡])(\w)', '\\1 \\2', msj)
 
     #print('#######')
     #print('TOKENS')
@@ -234,40 +541,68 @@ def tokenizado(msj=mensaje, nombres=''):
     #lista_tokens = [token.split('.')[0] + ' . ' + token.split('.')[1] if '.' in token else token for token in lista_tokens]
 
     # REVISAR
-    #print('ELIMINAR NOMBRES APELLIDOS ANTECESOR AUTOR PADRE')
+    #print('ELIMINAR NOMBRES APELLIDOS: ANTECESOR, AUTOR y PADRE')
     #print('#######')
+    #print('pruebas')
+    #print(nltk.edit_distance('Alfred', 'Aldred'), nltk.jaccard_distance(set('Alfred'), set('Aldred')))
+    #print(nltk.edit_distance('Purificación', 'Puri'), nltk.jaccard_distance(set('Purificación'), set('Puri')))
+    #exit(999)
 
     if nombres != '':
-        # Extrae la lista de los nombres
-        nombres = nombres.split(' ')
         #print("NOMBREEEEEEEE:", nombres)
 
-        # Quitar artículos
-        # ¿¿¿¿¿¿¿¿¿¿¿¿¿ Quitar stopwords ????????????? : if nombre in  stop_words
-        lista_nombres = set(['' if len(nombre) < 3 else nombre for nombre in nombres])
-        # Quitar Tildes Castellano, Catalán, Más tildes: ( ´ ` ) ^ ¨ ???
+        # Nombres y apellidos compuestos partidos
+        nombres_c = [nombre for nombre in nombres.replace(' ', '-').split('-') if nombre]
+
+        # Extrae la lista de los nombres
+        nombres = [nombre for nombre in nombres.split(' ') if nombre] + nombres_c
+        #print("NOMBREEEEEEEE C:", nombres)
+
+        # Nombres y Apellidos compuestos
+        # Bigramas
+        from nltk import bigrams
+
+        nombres_b = " ".join(["-".join(bi) if bi[0] != '' and bi[1] != '' else '' for bi in bigrams(nombres)])
+        nombres_b = [nombre for nombre in nombres_b.split(' ') if nombre]
+
+        # Nombres y apellidos compuestos con bigramas
+        nombres = nombres + nombres_b
+        #print("NOMBREEEEEEEE B:", nombres)
+
+        # Quitar artículos de la lista de nombres
+        # Quitar stopwords: (nombre in stop_words)
+        # Quitar repetidos
+        lista_nombres = set(['' if (len(nombre) < 3) or (nombre.lower() in stop_words) else nombre for nombre in nombres])
+
+        # Quitar Tildes Castellano, Catalán, ¿¿¿ Más tildes: ( ´ ` ) ^ ¨ ???
         lista_nombres = [nombre.replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace('Á', 'A').replace('É', 'E').replace('Í', 'I').replace('Ó', 'O').replace('Ú', 'U').replace('à', 'a').replace('é', 'e').replace('ì', 'i').replace('ò', 'o').replace('ù', 'u').replace('À', 'A').replace('È', 'E').replace('Ì', 'I').replace('Ò', 'O').replace('Ù', 'U') for nombre in lista_nombres]
         lista_tokens = [token.replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace('Á', 'A').replace('É', 'E').replace('Í', 'I').replace('Ó', 'O').replace('Ú', 'U').replace('à', 'a').replace('é', 'e').replace('ì', 'i').replace('ò', 'o').replace('ù', 'u').replace('À', 'A').replace('È', 'E').replace('Ì', 'I').replace('Ò', 'O').replace('Ù', 'U') for token in lista_tokens]
 
-        lista_tokens = ['ANONIMO' if token in lista_nombres else token for token in lista_tokens]
+        lista_tokens = ['[ANONIMO]' if token in lista_nombres else token for token in lista_tokens]
 
         # Distancia Levenshtein       |    Distancia Jaccard
         # ---------------------       |    -----------------
         # nltk.edit_distance(w1, w2)  |    nltk.jaccard_distance(set(w1), set(w2))
+        # Para tokens originales (0, 0.0) o para tokens en minúsculas (0, 0.0) de longitud inferior o igual a 3 caracteres
+        # Para tokens originales (1, 0.2) o para tokens en minúsculas (1, 0.1) de longitud superior a 3 caracteres
         for nombre in lista_nombres:
-            lista_tokens = ['ANONIMO' if (
-                    (nltk.edit_distance(token, nombre) <= 1 and nltk.jaccard_distance(set(token), set(nombre)) <= 0.2)
-                    and len(token) > 3) else token for token in lista_tokens]
-        #lista_tokens = ['ANONIMO' if (
+            lista_tokens = ['[ANONIMO]' if (
+                    ((((nltk.edit_distance(token, nombre) <= 0 and nltk.jaccard_distance(set(token), set(nombre)) <= 0.0)) or
+                     ((nltk.edit_distance(token.lower(), nombre.lower()) <= 0 and nltk.jaccard_distance(set(token.lower()), set(nombre.lower())) <= 0.0)))
+                     and len(token) <= 3) or
+                    ((((nltk.edit_distance(token, nombre) <= 0 and nltk.jaccard_distance(set(token), set(nombre)) <= 0.2)) or
+                     ((nltk.edit_distance(token.lower(), nombre.lower()) <= 1 and nltk.jaccard_distance(set(token.lower()), set(nombre.lower())) <= 0.1)))
+                     and len(token) > 3)) else token for token in lista_tokens]
+        #lista_tokens = ['[ANONIMO]' if (
         #        (nltk.edit_distance(token, lista_nombres[1]) <= 1 and nltk.jaccard_distance(set(token), set(lista_nombres[1])) <= 0.2)
         #        and len(token) > 3) else token for token in lista_tokens]
-        #lista_tokens = ['ANONIMO' if (
+        #lista_tokens = ['[ANONIMO]' if (
         #        ((nltk.edit_distance(token, nombre) <= 1 and nltk.jaccard_distance(set(token), set(nombre)) <= 0.2) for nombre in lista_nombres)
         #        and len(token) > 3) else token for token in lista_tokens]
 
-        #lista_tokens = ['ANONIMO' if procesadoMensaje.distancia_combinada(token, lista_nombres[1]) <= 1.5 else token for token in lista_tokens]
-        #lista_tokens = ['ANONIMO' if nltk.jaccard_distance(set(token), set(lista_nombres[1])) <= 0.2 else token for token in lista_tokens]
-        #lista_tokens = ['ANONIMO' if (nltk.edit_distance(token, lista_nombres[1]) == 1 and len(nombre) == len(lista_nombres[1]) and nltk.jaccard_distance(set(token), set(lista_nombres[1])) < 0.5) else token for token in lista_tokens]
+        #lista_tokens = ['[ANONIMO]' if procesadoMensaje.distancia_combinada(token, lista_nombres[1]) <= 1.5 else token for token in lista_tokens]
+        #lista_tokens = ['[ANONIMO]' if nltk.jaccard_distance(set(token), set(lista_nombres[1])) <= 0.2 else token for token in lista_tokens]
+        #lista_tokens = ['[ANONIMO]' if (nltk.edit_distance(token, lista_nombres[1]) == 1 and len(nombre) == len(lista_nombres[1]) and nltk.jaccard_distance(set(token), set(lista_nombres[1])) < 0.5) else token for token in lista_tokens]
 
         #print("NOMBREEEEEEEE:", lista_nombres)
 
@@ -283,11 +618,19 @@ def tokenizado(msj=mensaje, nombres=''):
 
     # 1 LONGITUD
     longitud_caracteres = len(msj)
-    numero_clicks = longitud_caracteres
 
     # 2 NUMERO
     numero_tokens = len(lista_tokens)
     numero_frases = len(sentencias)
+    # Busca caracteres ALFANUMERICOS y NO ALFANUMERICOS
+    if longitud_caracteres > 0:
+        # Todos los [A-Z,a-Z,0-9,acentuadas y eñes]
+        numero_alfanumericos = len(re.findall(r'\w', msj, re.M | re.I))
+        numero_clicks = longitud_caracteres - numero_alfanumericos
+        #print('ALFANUMERICOS ENCONTRADOS: ', len(msj), numero_alfanumericos, numero_clicks, msj)
+    else:
+        numero_alfanumericos = 0
+        numero_clicks = 0
 
     # 3 MEDIAS
     # Pendiente de Calcular
@@ -300,26 +643,6 @@ def tokenizado(msj=mensaje, nombres=''):
     # STOPWRODS
     #print('STOPWRODS lang="es"')
     #print('#######')
-    stop_words = stopwords.words('spanish')
-
-    # Añadir signos de puntuación
-    stop_words.append('.')
-    stop_words.append(':')
-    stop_words.append(',')
-    stop_words.append(';')
-    stop_words.append('-')
-    stop_words.append('"')
-    stop_words.append('¡')
-    stop_words.append('!')
-    stop_words.append('¡')
-    stop_words.append('?')
-    stop_words.append('&')
-    stop_words.append('/')
-    stop_words.append('(')
-    stop_words.append(')')
-    stop_words.extend(
-        ('¡', '¿', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<',
-         '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~'))
 
     # PALABRAS = (TOKENS - STOPWORDS)
     for t in lista_tokens:
@@ -337,7 +660,8 @@ def tokenizado(msj=mensaje, nombres=''):
     #print(lista_tokens)
 
     return {"c": msj, "lc": longitud_caracteres, 't': lista_tokens, 'nt': numero_tokens, 'f': sentencias,
-            'nf': numero_frases, 'p': lista_palabras, 'np': numero_palabras, 'ns': numero_stop_words}
+            'nf': numero_frases, 'p': lista_palabras, 'np': numero_palabras, 'ns': numero_stop_words,
+            'na': numero_alfanumericos, 'nc': numero_clicks}
 
 
 # RAIZ
@@ -478,7 +802,7 @@ def postag(msj=mensaje):
 ###########################
 # CLASIFICACIONES Y CULSTER
 ###########################
-# CULSTERING
+# CULSTER
 ########################
 def cluster(ins=instancias):
     from nltk.cluster import em
@@ -580,11 +904,16 @@ def cluster(ins=instancias):
     return 0
 
 
+###########################
 # CLASIFICACIONES
 ########################
+def clasificador(ins=instancias):
+    return 0
+
+
 # GENERO
 ########################
-def genero():
+def genero(listaNombres=nombres):
     from nltk.corpus import names
 
     print('#######')
